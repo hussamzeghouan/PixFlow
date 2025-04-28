@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PixFlow</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- 
+    PixFlow
+    Flexible Pixel Patterns
+    Created by: Hussam Zeghouan
+    Linktree: https://linktr.ee/hsm_ze
+    Instagram: https://instagram.com/hsm_ze
+    Behance: https://behance.net/hsm_ze
+  -->
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #121212;
+      font-family: 'Inter', sans-serif;
+      color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    .tagline {
+      text-align: center;
+      font-size: 18px;
+      color: #bbb;
+      margin-bottom: 40px;
+    }
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    .controls, .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: center;
+    }
+    .controls label, .checkboxes label {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      width: 150px;
+    }
+    input[type="number"], input[type="color"], input[type="range"] {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #2b2b2b;
+      color: #fff;
+      width: 100%;
+    }
+    input[type="file"] {
+      color: #f5f5f5;
+    }
+    button {
+      background-color: #18A0FB;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin: 10px 5px 0;
+    }
+    button:hover {
+      background-color: #0d8ae2;
+    }
+    #roundedCornersSettings {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 10px;
+    }
+    #grid {
+      display: block;
+      margin: 20px auto;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+    }
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: #888;
+      font-size: 14px;
+    }
+    footer a {
+      margin: 0 10px;
+      color: #888;
+      font-size: 24px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>PixFlow</h1>
+<p class="tagline">Flexible Pixel Patterns</p>
+
+<div class="container">
+
+  <div class="card">
+    <div class="controls">
+      <label title="عرض الخلية بوحدة البكسل">Cell Width (px)
+        <input type="number" id="cellWidth" value="40">
+      </label>
+      <label title="ارتفاع الخلية بوحدة البكسل">Cell Height (px)
+        <input type="number" id="cellHeight" value="40">
+      </label>
+      <label title="عدد الأعمدة">Columns
+        <input type="number" id="columns" value="10">
+      </label>
+      <label title="عدد الصفوف">Rows
+        <input type="number" id="rows" value="10">
+      </label>
+      <label title="لون تعبئة الخلايا">Fill Color
+        <input type="color" id="fillColor" value="#ffffff">
+      </label>
+      <label title="لون خلفية الكانفس">Background Color
+        <input type="color" id="bgColor" value="#121212">
+      </label>
+      <label title="نسبة تعبئة الخلايا">Fill Percentage
+        <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
+        <span id="percentLabel">50%</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="checkboxes">
+      <label><input type="checkbox" id="randomSize" title="توليد خلايا بأحجام عشوائية"> Random Cell Size</label>
+      <label><input type="checkbox" id="roundedCorners" title="تدوير حواف الخلايا بالنسبة المئوية" onchange="toggleRoundedCornersSettings()"> Rounded Corners</label>
+      <label><input type="checkbox" id="multiColor" title="تلوين الخلايا بألوان متعددة"> Multi-Color Fill</label>
+      <label><input type="checkbox" id="applyShear" title="تطبيق انحراف خفيف للخلايا"> Apply Shear (Distortion)</label>
+    </div>
+    <div id="roundedCornersSettings">
+      <label>Corner Radius %
+        <input type="range" id="cornerRadius" min="0" max="50" value="10" oninput="updateCornerLabel(this.value)">
+        <span id="cornerLabel">10%</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card" style="text-align: center;">
+    <button onclick="generateGrid()" title="توليد الشبكة">Generate Pattern</button>
+    <button onclick="exportSVG()" title="تصدير كملف SVG">Export SVG</button>
+    <button onclick="exportPNG()" title="تصدير كصورة PNG">Export PNG</button>
+  </div>
+
+  <svg id="grid" width="800" height="800"></svg>
+
+</div>
+
+<footer>
+  Designed ❤️ — for all creative minds<br><br>
+  <small>Created by <strong>Hussam Zeghouan</strong></small><br><br>
+
+  <a href="https://instagram.com/hsm_ze" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+  <a href="https://behance.net/hsm_ze" target="_blank" title="Behance"><i class="fab fa-behance"></i></a>
+  <a href="https://linktr.ee/hsm_ze" target="_blank" title="Linktree"><i class="fas fa-link"></i></a>
+</footer>
+
+<script>
+// Functions for generating grid, handling images, exporting, etc.
+</script>
+
+</body>
+</html>
