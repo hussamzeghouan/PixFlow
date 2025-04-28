@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>PixFlow</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
       margin: 0;
@@ -13,18 +11,16 @@
       background: #121212;
       font-family: 'Inter', sans-serif;
       color: #f5f5f5;
+      text-align: center;
     }
     h1 {
-      text-align: center;
-      font-weight: 700;
       font-size: 48px;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
     }
     .tagline {
-      text-align: center;
       font-size: 18px;
       color: #bbb;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
     .container {
       max-width: 1100px;
@@ -39,19 +35,22 @@
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
-    .controls, .checkboxes {
+    .controls {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
-      align-items: center;
+      justify-content: center;
     }
-    .controls label, .checkboxes label {
+    .controls label {
       display: flex;
       flex-direction: column;
+      align-items: center;
+      gap: 5px;
       font-size: 14px;
       width: 150px;
     }
-    input[type="number"], input[type="color"], input[type="range"] {
+    input[type="number"],
+    input[type="range"] {
       padding: 8px;
       border-radius: 6px;
       border: none;
@@ -59,8 +58,28 @@
       color: #fff;
       width: 100%;
     }
-    input[type="file"] {
-      color: #f5f5f5;
+    input[type="color"] {
+      width: 60px;
+      height: 60px;
+      border: none;
+      border-radius: 8px;
+      background: #2b2b2b;
+      cursor: pointer;
+    }
+    .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .checkboxes label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
+      width: 150px;
+      cursor: pointer;
     }
     button {
       background-color: #18A0FB;
@@ -70,34 +89,31 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s;
       margin: 10px 5px 0;
+      transition: background-color 0.3s;
     }
     button:hover {
       background-color: #0d8ae2;
     }
-    #roundedCornersSettings {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 10px;
-    }
     #grid {
-      display: block;
       margin: 20px auto;
       background: #1a1a1a;
       border: 1px solid #333;
       border-radius: 12px;
+      display: block;
+    }
+    #roundedCornersSettings {
+      display: none;
+      margin-top: 10px;
     }
     footer {
-      text-align: center;
-      margin-top: 60px;
+      margin-top: 40px;
       color: #888;
       font-size: 14px;
     }
     footer a {
-      margin: 0 10px;
       color: #888;
+      margin: 0 10px;
       font-size: 24px;
       text-decoration: none;
     }
@@ -113,25 +129,25 @@
 
   <div class="card">
     <div class="controls">
-      <label>Cell Width (px)
+      <label title="تحديد عرض الخلية بالبكسل">Cell Width (px)
         <input type="number" id="cellWidth" value="40">
       </label>
-      <label>Cell Height (px)
+      <label title="تحديد ارتفاع الخلية بالبكسل">Cell Height (px)
         <input type="number" id="cellHeight" value="40">
       </label>
-      <label>Columns
+      <label title="عدد الأعمدة">Columns
         <input type="number" id="columns" value="10">
       </label>
-      <label>Rows
+      <label title="عدد الصفوف">Rows
         <input type="number" id="rows" value="10">
       </label>
-      <label>Fill Color
+      <label title="لون تعبئة الخلايا">Fill Color
         <input type="color" id="fillColor" value="#ffffff">
       </label>
-      <label>Background Color
+      <label title="لون خلفية الشبكة">Background Color
         <input type="color" id="bgColor" value="#121212">
       </label>
-      <label>Fill Percentage
+      <label title="نسبة ملء الخلايا">Fill Percentage
         <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
         <span id="percentLabel">50%</span>
       </label>
@@ -140,23 +156,31 @@
 
   <div class="card">
     <div class="checkboxes">
-      <label><input type="checkbox" id="randomSize"> Random Cell Size</label>
-      <label><input type="checkbox" id="roundedCorners" onchange="toggleRoundedCornersSettings()"> Rounded Corners</label>
-      <label><input type="checkbox" id="multiColor"> Multi-Color Fill</label>
-      <label><input type="checkbox" id="applyShear"> Apply Shear (Distortion)</label>
+      <label title="توليد خلايا بأحجام عشوائية">
+        <input type="checkbox" id="randomSize"> Random Cell Size
+      </label>
+      <label title="تدوير حواف الخلايا">
+        <input type="checkbox" id="roundedCorners" onchange="toggleRoundedCornersSettings()"> Rounded Corners
+      </label>
+      <label title="تلوين الخلايا بألوان متعددة">
+        <input type="checkbox" id="multiColor"> Multi-Color Fill
+      </label>
+      <label title="تطبيق انحراف للخلايا">
+        <input type="checkbox" id="applyShear"> Apply Shear (Distortion)
+      </label>
     </div>
     <div id="roundedCornersSettings">
-      <label>Corner Radius %
+      <label title="تحديد نسبة تدوير الزوايا">Corner Radius %
         <input type="range" id="cornerRadius" min="0" max="50" value="10" oninput="updateCornerLabel(this.value)">
         <span id="cornerLabel">10%</span>
       </label>
     </div>
   </div>
 
-  <div class="card" style="text-align: center;">
-    <button onclick="generateGrid()">Generate Pattern</button>
-    <button onclick="exportSVG()">Export SVG</button>
-    <button onclick="exportPNG()">Export PNG</button>
+  <div class="card">
+    <button onclick="generateGrid()" title="توليد الشبكة">Generate Pattern</button>
+    <button onclick="exportSVG()" title="حفظ كملف SVG">Export SVG</button>
+    <button onclick="exportPNG()" title="حفظ كصورة PNG">Export PNG</button>
   </div>
 
   <svg id="grid" width="800" height="800"></svg>
@@ -182,7 +206,7 @@ function updateCornerLabel(value) {
 
 function toggleRoundedCornersSettings() {
   const settings = document.getElementById('roundedCornersSettings');
-  settings.style.display = document.getElementById('roundedCorners').checked ? 'flex' : 'none';
+  settings.style.display = document.getElementById('roundedCorners').checked ? 'block' : 'none';
 }
 
 function generateGrid() {
@@ -218,7 +242,7 @@ function generateGrid() {
 
       let color = fillColor;
       if (multiColor) {
-        color = '#' + Math.floor(Math.random()*16777215).toString(16);
+        color = '#' + Math.floor(Math.random() * 16777215).toString(16);
       }
 
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -234,7 +258,7 @@ function generateGrid() {
       }
 
       if (applyShear) {
-        rect.setAttribute('transform', `skewX(${Math.random()*10 - 5}) skewY(${Math.random()*10 - 5})`);
+        rect.setAttribute('transform', `skewX(${Math.random()*10-5}) skewY(${Math.random()*10-5})`);
       }
 
       svg.appendChild(rect);
@@ -246,7 +270,6 @@ function exportSVG() {
   const svg = document.getElementById('grid');
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svg);
-
   const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 
@@ -260,26 +283,26 @@ function exportPNG() {
   const svg = document.getElementById('grid');
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svg);
-  const image = new Image();
-  const svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+  const img = new Image();
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
 
-  image.onload = function() {
+  img.onload = function() {
     const canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 800;
-    const context = canvas.getContext('2d');
-    context.fillStyle = document.getElementById('bgColor').value;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, 0, 0);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(url);
 
     const link = document.createElement('a');
-    link.download = 'pixel-pattern.png';
     link.href = canvas.toDataURL('image/png');
+    link.download = 'pixel-pattern.png';
     link.click();
   };
-  image.src = url;
+  img.src = url;
 }
 </script>
 
