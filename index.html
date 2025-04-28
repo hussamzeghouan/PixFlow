@@ -49,9 +49,11 @@
       font-size: 14px;
       width: 140px;
     }
-    input[type="number"], input[type="range"], input[type="color"] {
+    input[type="number"],
+    input[type="color"],
+    input[type="range"] {
       padding: 8px;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
       background: #2b2b2b;
       color: #fff;
@@ -59,8 +61,9 @@
       height: 40px;
     }
     input[type="color"] {
+      appearance: none;
+      -webkit-appearance: none;
       padding: 0;
-      background: none;
       cursor: pointer;
     }
     .checkboxes label {
@@ -139,7 +142,7 @@
       <label title="لون خلفية الشبكة">Background Color
         <input type="color" id="bgColor" value="#121212">
       </label>
-      <label title="نسبة تعبئة الخلايا">Fill %
+      <label title="نسبة تعبئة الخلايا">Fill Percentage
         <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
         <span id="percentLabel">50%</span>
       </label>
