@@ -1,298 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>PixFlow</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      background: #121212;
-      font-family: 'Inter', sans-serif;
-      color: #f5f5f5;
-      text-align: center;
-    }
-    h1 {
-      font-size: 48px;
-      margin-bottom: 5px;
-    }
-    .tagline {
-      font-size: 18px;
-      color: #bbb;
-      margin-bottom: 30px;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    }
-    .controls, .checkboxes {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    .controls label, .checkboxes label {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 14px;
-      width: 140px;
-    }
-    input[type="number"], input[type="range"] {
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      background: #2b2b2b;
-      color: #fff;
-      width: 100%;
-    }
-    input[type="color"] {
-      width: 20px;
-      height: 20px;
-      padding: 0;
-      border: none;
-      border-radius: 6px;
-      background: none;
-      cursor: pointer;
-    }
-    .checkboxes label {
-      flex-direction: row;
-      justify-content: center;
-      gap: 10px;
-      width: auto;
-    }
-    .checkboxes i {
-      color: #bbb;
-      font-size: 20px;
-    }
-    button {
-      background-color: #18A0FB;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 10px 5px 0;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #0d8ae2;
-    }
-    #grid {
-      margin: 20px auto;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 12px;
-      display: block;
-    }
-    footer {
-      margin-top: 40px;
-      color: #888;
-      font-size: 14px;
-    }
-    footer a {
-      color: #888;
-      margin: 0 10px;
-      font-size: 24px;
-      text-decoration: none;
-    }
-    #roundedCornersSettings {
-      display: none;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-
-<body>
-
-<h1>PixFlow</h1>
-<p class="tagline">Flexible Pixel Patterns</p>
-
-<div class="container">
-
-  <div class="card">
-    <div class="controls">
-      <label title="تحديد عرض الخلية">Cell Width (px)
-        <input type="number" id="cellWidth" value="40">
-      </label>
-      <label title="تحديد ارتفاع الخلية">Cell Height (px)
-        <input type="number" id="cellHeight" value="40">
-      </label>
-      <label title="عدد الأعمدة">Columns
-        <input type="number" id="columns" value="10">
-      </label>
-      <label title="عدد الصفوف">Rows
-        <input type="number" id="rows" value="10">
-      </label>
-      <label title="لون تعبئة الخلايا">Fill Color
-        <input type="color" id="fillColor" value="#ff6666">
-      </label>
-      <label title="لون خلفية الكانفس">Background Color
-        <input type="color" id="bgColor" value="#121212">
-      </label>
-      <label title="نسبة تعبئة الخلايا">Fill %
-        <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
-        <span id="percentLabel">50%</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="checkboxes">
-      <label title="توليد خلايا بأحجام عشوائية">
-        <input type="checkbox" id="randomSize"> <i class="fas fa-dice"></i> Random Size
-      </label>
-      <label title="تدوير حواف الخلايا">
-        <input type="checkbox" id="roundedCorners" onchange="toggleRoundedCornersSettings()"> <i class="fas fa-circle"></i> Rounded Corners
-      </label>
-      <label title="تلوين بألوان متعددة">
-        <input type="checkbox" id="multiColor"> <i class="fas fa-palette"></i> Multi-Color
-      </label>
-      <label title="تطبيق انحراف للخلايا">
-        <input type="checkbox" id="applyShear"> <i class="fas fa-wave-square"></i> Shear
-      </label>
-    </div>
-    <div id="roundedCornersSettings">
-      <label title="نسبة دوران الزوايا">Corner Radius %
-        <input type="range" id="cornerRadius" min="0" max="50" value="10" oninput="updateCornerLabel(this.value)">
-        <span id="cornerLabel">10%</span>
-      </label>
-    </div>
-  </div>
-
-  <div class="card">
-    <button onclick="generateGrid()">Generate Pattern</button>
-    <button onclick="exportSVG()">Export SVG</button>
-    <button onclick="exportPNG()">Export PNG</button>
-  </div>
-
-  <svg id="grid" width="800" height="800"></svg>
-
-</div>
-
-<footer>
-  Designed ❤️ — for all creative minds<br><br>
-  <small>Created by <strong>Hussam Zeghouan</strong></small><br><br>
-  <a href="https://instagram.com/hsm_ze" target="_blank"><i class="fab fa-instagram"></i></a>
-  <a href="https://behance.net/hsm_ze" target="_blank"><i class="fab fa-behance"></i></a>
-  <a href="https://linktr.ee/hsm_ze" target="_blank"><i class="fas fa-link"></i></a>
-</footer>
-
-<script>
-function updatePercentLabel(value) {
-  document.getElementById('percentLabel').innerText = value + '%';
-}
-function updateCornerLabel(value) {
-  document.getElementById('cornerLabel').innerText = value + '%';
-}
-function toggleRoundedCornersSettings() {
-  const settings = document.getElementById('roundedCornersSettings');
-  settings.style.display = document.getElementById('roundedCorners').checked ? 'block' : 'none';
-}
-function generateGrid() {
-  const svg = document.getElementById('grid');
-  svg.innerHTML = '';
-  const cellWidth = parseInt(document.getElementById('cellWidth').value);
-  const cellHeight = parseInt(document.getElementById('cellHeight').value);
-  const columns = parseInt(document.getElementById('columns').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  const fillColor = document.getElementById('fillColor').value;
-  const bgColor = document.getElementById('bgColor').value;
-  const fillPercent = parseInt(document.getElementById('fillPercent').value);
-  const randomSize = document.getElementById('randomSize').checked;
-  const roundedCorners = document.getElementById('roundedCorners').checked;
-  const multiColor = document.getElementById('multiColor').checked;
-  const applyShear = document.getElementById('applyShear').checked;
-  const cornerRadius = parseInt(document.getElementById('cornerRadius').value);
-
-  svg.style.background = bgColor;
-
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < columns; x++) {
-      if (Math.random() * 100 > fillPercent) continue;
-
-      let width = cellWidth;
-      let height = cellHeight;
-
-      if (randomSize) {
-        width *= 0.5 + Math.random();
-        height *= 0.5 + Math.random();
-      }
-
-      let color = fillColor;
-      if (multiColor) {
-        color = '#' + Math.floor(Math.random()*16777215).toString(16);
-      }
-
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      rect.setAttribute('x', x * cellWidth);
-      rect.setAttribute('y', y * cellHeight);
-      rect.setAttribute('width', width);
-      rect.setAttribute('height', height);
-      rect.setAttribute('fill', color);
-
-      if (roundedCorners) {
-        rect.setAttribute('rx', (cornerRadius/100) * (cellWidth/2));
-        rect.setAttribute('ry', (cornerRadius/100) * (cellHeight/2));
-      }
-
-      if (applyShear) {
-        rect.setAttribute('transform', `skewX(${Math.random()*10-5}) skewY(${Math.random()*10-5})`);
-      }
-
-      svg.appendChild(rect);
-    }
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #121212;
+    font-family: 'Inter', sans-serif;
+    color: #f5f5f5;
+    text-align: center;
   }
-}
-function exportSVG() {
-  const svg = document.getElementById('grid');
-  const serializer = new XMLSerializer();
-  const source = serializer.serializeToString(svg);
-  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'pixel-pattern.svg';
-  link.click();
-}
-function exportPNG() {
-  const svg = document.getElementById('grid');
-  const serializer = new XMLSerializer();
-  const source = serializer.serializeToString(svg);
-  const img = new Image();
-  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
-
-  img.onload = function() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 800;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = document.getElementById('bgColor').value;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0);
-    URL.revokeObjectURL(url);
-
-    const link = document.createElement('a');
-    link.href = canvas.toDataURL('image/png');
-    link.download = 'pixel-pattern.png';
-    link.click();
-  };
-  img.src = url;
-}
-</script>
-
-</body>
-</html>
+  h1 {
+    font-size: 48px;
+    margin-bottom: 5px;
+  }
+  .tagline {
+    font-size: 18px;
+    color: #bbb;
+    margin-bottom: 30px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .card {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  .controls, .checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  .controls label, .checkboxes label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    width: 140px;
+  }
+  input[type="number"], input[type="range"] {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    background: #2b2b2b;
+    color: #fff;
+    width: 100%;
+  }
+  input[type="color"] {
+    width: 100%;
+    height: 40px;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: #2b2b2b;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .checkboxes label {
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    width: auto;
+  }
+  .checkboxes i {
+    color: #bbb;
+    font-size: 20px;
+  }
+  button {
+    background-color: #18A0FB;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 10px 5px 0;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #0d8ae2;
+  }
+  #grid {
+    margin: 20px auto;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    display: block;
+  }
+  footer {
+    margin-top: 40px;
+    color: #888;
+    font-size: 14px;
+  }
+  footer a {
+    color: #888;
+    margin: 0 10px;
+    font-size: 24px;
+    text-decoration: none;
+  }
+  #roundedCornersSettings {
+    display: none;
+    margin-top: 10px;
+  }
+</style>
