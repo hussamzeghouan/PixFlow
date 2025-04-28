@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>PixFlow</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -13,42 +12,33 @@
       background: #121212;
       font-family: 'Inter', sans-serif;
       color: #f5f5f5;
-    }
-    h1, .tagline {
       text-align: right;
-      margin-right: 20px;
     }
     h1 {
       font-size: 48px;
-      font-weight: 700;
-      margin-bottom: 0;
+      margin-bottom: 5px;
     }
     .tagline {
       font-size: 18px;
       color: #bbb;
-      margin-top: 4px;
-      margin-bottom: 40px;
-    }
-    .container {
-      display: flex;
-      gap: 20px;
-      max-width: 1200px;
-      margin: auto;
+      margin-bottom: 30px;
     }
     .controls {
-      width: 300px;
       display: flex;
       flex-direction: column;
       gap: 15px;
+      max-width: 300px;
+      margin-bottom: 30px;
     }
     label {
       display: flex;
       flex-direction: column;
       font-size: 14px;
+      gap: 5px;
     }
     input[type="number"],
     input[type="range"],
-    select {
+    input[type="file"] {
       padding: 8px;
       border-radius: 6px;
       border: none;
@@ -79,58 +69,44 @@
       background-color: #0d8ae2;
     }
     .canvas-container {
+      margin-top: 40px;
       position: relative;
+      width: 800px;
+      height: 800px;
+      margin-inline: auto;
     }
     canvas {
       background: #1a1a1a;
       border: 1px solid #333;
       border-radius: 12px;
+      display: block;
+    }
+    .ruler-horizontal, .ruler-vertical {
+      position: absolute;
+      font-size: 10px;
+      color: #888;
     }
     .ruler-horizontal {
-      position: absolute;
       top: -30px;
       left: 0;
-      display: flex;
       width: 800px;
-      height: 30px;
-      font-size: 10px;
-      color: #888;
+      display: flex;
+    }
+    .ruler-horizontal div {
+      width: 50px;
+      text-align: center;
     }
     .ruler-vertical {
-      position: absolute;
       top: 0;
       left: -30px;
+      height: 800px;
       display: flex;
       flex-direction: column;
-      width: 30px;
-      height: 800px;
-      font-size: 10px;
-      color: #888;
-    }
-    .ruler-horizontal div,
-    .ruler-vertical div {
-      flex: none;
-      width: 50px;
-      height: 30px;
-      text-align: center;
-      line-height: 30px;
     }
     .ruler-vertical div {
-      width: 30px;
       height: 50px;
       line-height: 50px;
-    }
-    footer {
       text-align: center;
-      margin-top: 60px;
-      color: #888;
-      font-size: 14px;
-    }
-    footer a {
-      margin: 0 8px;
-      color: #888;
-      font-size: 24px;
-      text-decoration: none;
     }
   </style>
 </head>
@@ -139,54 +115,43 @@
 <h1>PixFlow</h1>
 <p class="tagline">Flexible Pixel Patterns</p>
 
-<div class="container">
+<div class="controls">
+  <label>Cell Width (px)
+    <input type="number" id="cellWidth" value="40">
+  </label>
+  <label>Cell Height (px)
+    <input type="number" id="cellHeight" value="40">
+  </label>
+  <label>Columns
+    <input type="number" id="columns" value="10">
+  </label>
+  <label>Rows
+    <input type="number" id="rows" value="10">
+  </label>
+  <label>Fill Color
+    <input type="color" id="fillColor" value="#ffffff">
+  </label>
+  <label>Background Color
+    <input type="color" id="bgColor" value="#121212">
+  </label>
+  <label>Upload Reference Image
+    <input type="file" id="referenceImageInput" accept="image/*">
+  </label>
+  <label>Reference Opacity
+    <input type="range" id="opacityRange" min="0" max="100" value="50">
+  </label>
 
-  <div class="controls">
-    <label>Cell Width (px)
-      <input type="number" id="cellWidth" value="40">
-    </label>
-    <label>Cell Height (px)
-      <input type="number" id="cellHeight" value="40">
-    </label>
-    <label>Columns
-      <input type="number" id="columns" value="10">
-    </label>
-    <label>Rows
-      <input type="number" id="rows" value="10">
-    </label>
-    <label>Fill Color
-      <input type="color" id="fillColor" value="#ffffff">
-    </label>
-    <label>Background Color
-      <input type="color" id="bgColor" value="#121212">
-    </label>
-    <label>Upload Reference Image
-      <input type="file" id="referenceImageInput" accept="image/*">
-    </label>
-    <label>Reference Opacity
-      <input type="range" id="opacityRange" min="0" max="100" value="50">
-    </label>
-    <button onclick="generateGrid()">Generate Pattern</button>
-    <button onclick="exportPNG()">Export as PNG</button>
-    <button onclick="exportSVG()">Export as SVG</button>
-  </div>
-
-  <div class="canvas-container" style="width: 800px; height: 800px; position: relative;">
-    <div class="ruler-horizontal" id="rulerTop"></div>
-    <div class="ruler-vertical" id="rulerLeft"></div>
-    <canvas id="pixelCanvas" width="800" height="800"></canvas>
-    <canvas id="referenceCanvas" width="800" height="800" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
-  </div>
-
+  <button onclick="generateGrid()">Generate Pattern</button>
+  <button onclick="exportPNG()">Export as PNG</button>
+  <button onclick="exportSVG()">Export as SVG</button>
 </div>
 
-<footer>
-  Designed ❤️ — for all creative minds<br><br>
-  <small>Created by <strong>Hussam Zeghouan</strong></small><br><br>
-  <a href="https://instagram.com/hsm_ze" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-  <a href="https://behance.net/hsm_ze" target="_blank" title="Behance"><i class="fab fa-behance"></i></a>
-  <a href="https://linktr.ee/hsm_ze" target="_blank" title="Linktree"><i class="fas fa-link"></i></a>
-</footer>
+<div class="canvas-container">
+  <div class="ruler-horizontal" id="rulerTop"></div>
+  <div class="ruler-vertical" id="rulerLeft"></div>
+  <canvas id="pixelCanvas" width="800" height="800"></canvas>
+  <canvas id="referenceCanvas" width="800" height="800" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+</div>
 
 <script>
 const pixelCanvas = document.getElementById('pixelCanvas');
