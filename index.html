@@ -6,14 +6,6 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- 
-    PixFlow
-    Flexible Pixel Patterns
-    Created by: Hussam Zeghouan
-    Linktree: https://linktr.ee/hsm_ze
-    Instagram: https://instagram.com/hsm_ze
-    Behance: https://behance.net/hsm_ze
-  -->
   <style>
     body {
       margin: 0;
@@ -121,25 +113,25 @@
 
   <div class="card">
     <div class="controls">
-      <label title="عرض الخلية بوحدة البكسل">Cell Width (px)
+      <label>Cell Width (px)
         <input type="number" id="cellWidth" value="40">
       </label>
-      <label title="ارتفاع الخلية بوحدة البكسل">Cell Height (px)
+      <label>Cell Height (px)
         <input type="number" id="cellHeight" value="40">
       </label>
-      <label title="عدد الأعمدة">Columns
+      <label>Columns
         <input type="number" id="columns" value="10">
       </label>
-      <label title="عدد الصفوف">Rows
+      <label>Rows
         <input type="number" id="rows" value="10">
       </label>
-      <label title="لون تعبئة الخلايا">Fill Color
+      <label>Fill Color
         <input type="color" id="fillColor" value="#ffffff">
       </label>
-      <label title="لون خلفية الكانفس">Background Color
+      <label>Background Color
         <input type="color" id="bgColor" value="#121212">
       </label>
-      <label title="نسبة تعبئة الخلايا">Fill Percentage
+      <label>Fill Percentage
         <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
         <span id="percentLabel">50%</span>
       </label>
@@ -148,10 +140,10 @@
 
   <div class="card">
     <div class="checkboxes">
-      <label><input type="checkbox" id="randomSize" title="توليد خلايا بأحجام عشوائية"> Random Cell Size</label>
-      <label><input type="checkbox" id="roundedCorners" title="تدوير حواف الخلايا بالنسبة المئوية" onchange="toggleRoundedCornersSettings()"> Rounded Corners</label>
-      <label><input type="checkbox" id="multiColor" title="تلوين الخلايا بألوان متعددة"> Multi-Color Fill</label>
-      <label><input type="checkbox" id="applyShear" title="تطبيق انحراف خفيف للخلايا"> Apply Shear (Distortion)</label>
+      <label><input type="checkbox" id="randomSize"> Random Cell Size</label>
+      <label><input type="checkbox" id="roundedCorners" onchange="toggleRoundedCornersSettings()"> Rounded Corners</label>
+      <label><input type="checkbox" id="multiColor"> Multi-Color Fill</label>
+      <label><input type="checkbox" id="applyShear"> Apply Shear (Distortion)</label>
     </div>
     <div id="roundedCornersSettings">
       <label>Corner Radius %
@@ -162,9 +154,9 @@
   </div>
 
   <div class="card" style="text-align: center;">
-    <button onclick="generateGrid()" title="توليد الشبكة">Generate Pattern</button>
-    <button onclick="exportSVG()" title="تصدير كملف SVG">Export SVG</button>
-    <button onclick="exportPNG()" title="تصدير كصورة PNG">Export PNG</button>
+    <button onclick="generateGrid()">Generate Pattern</button>
+    <button onclick="exportSVG()">Export SVG</button>
+    <button onclick="exportPNG()">Export PNG</button>
   </div>
 
   <svg id="grid" width="800" height="800"></svg>
@@ -174,14 +166,121 @@
 <footer>
   Designed ❤️ — for all creative minds<br><br>
   <small>Created by <strong>Hussam Zeghouan</strong></small><br><br>
-
-  <a href="https://instagram.com/hsm_ze" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-  <a href="https://behance.net/hsm_ze" target="_blank" title="Behance"><i class="fab fa-behance"></i></a>
-  <a href="https://linktr.ee/hsm_ze" target="_blank" title="Linktree"><i class="fas fa-link"></i></a>
+  <a href="https://instagram.com/hsm_ze" target="_blank"><i class="fab fa-instagram"></i></a>
+  <a href="https://behance.net/hsm_ze" target="_blank"><i class="fab fa-behance"></i></a>
+  <a href="https://linktr.ee/hsm_ze" target="_blank"><i class="fas fa-link"></i></a>
 </footer>
 
 <script>
-// Functions for generating grid, handling images, exporting, etc.
+function updatePercentLabel(value) {
+  document.getElementById('percentLabel').innerText = value + '%';
+}
+
+function updateCornerLabel(value) {
+  document.getElementById('cornerLabel').innerText = value + '%';
+}
+
+function toggleRoundedCornersSettings() {
+  const settings = document.getElementById('roundedCornersSettings');
+  settings.style.display = document.getElementById('roundedCorners').checked ? 'flex' : 'none';
+}
+
+function generateGrid() {
+  const svg = document.getElementById('grid');
+  svg.innerHTML = '';
+
+  const cellWidth = parseInt(document.getElementById('cellWidth').value);
+  const cellHeight = parseInt(document.getElementById('cellHeight').value);
+  const columns = parseInt(document.getElementById('columns').value);
+  const rows = parseInt(document.getElementById('rows').value);
+  const fillColor = document.getElementById('fillColor').value;
+  const bgColor = document.getElementById('bgColor').value;
+  const fillPercent = parseInt(document.getElementById('fillPercent').value);
+  const randomSize = document.getElementById('randomSize').checked;
+  const roundedCorners = document.getElementById('roundedCorners').checked;
+  const multiColor = document.getElementById('multiColor').checked;
+  const applyShear = document.getElementById('applyShear').checked;
+  const cornerRadius = parseInt(document.getElementById('cornerRadius').value);
+
+  svg.style.background = bgColor;
+
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      if (Math.random() * 100 > fillPercent) continue;
+
+      let width = cellWidth;
+      let height = cellHeight;
+
+      if (randomSize) {
+        width *= 0.5 + Math.random();
+        height *= 0.5 + Math.random();
+      }
+
+      let color = fillColor;
+      if (multiColor) {
+        color = '#' + Math.floor(Math.random()*16777215).toString(16);
+      }
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x * cellWidth);
+      rect.setAttribute('y', y * cellHeight);
+      rect.setAttribute('width', width);
+      rect.setAttribute('height', height);
+      rect.setAttribute('fill', color);
+
+      if (roundedCorners) {
+        rect.setAttribute('rx', (cornerRadius/100) * (cellWidth/2));
+        rect.setAttribute('ry', (cornerRadius/100) * (cellHeight/2));
+      }
+
+      if (applyShear) {
+        rect.setAttribute('transform', `skewX(${Math.random()*10 - 5}) skewY(${Math.random()*10 - 5})`);
+      }
+
+      svg.appendChild(rect);
+    }
+  }
+}
+
+function exportSVG() {
+  const svg = document.getElementById('grid');
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pixel-pattern.svg';
+  link.click();
+}
+
+function exportPNG() {
+  const svg = document.getElementById('grid');
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const image = new Image();
+  const svgBlob = new Blob([source], {type:"image/svg+xml;charset=utf-8"});
+  const url = URL.createObjectURL(svgBlob);
+
+  image.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 800;
+    const context = canvas.getContext('2d');
+    context.fillStyle = document.getElementById('bgColor').value;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const link = document.createElement('a');
+    link.download = 'pixel-pattern.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+  image.src = url;
+}
 </script>
 
 </body>
