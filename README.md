@@ -22,7 +22,6 @@ Created for designers, artists, and creative minds who love experimenting with s
 
 ## 🚀 طريقة الاستخدام
 
-- افتح ملف `index.html` في متصفحك.
 - عدل حجم الخلايا والعناصر حسب رغبتك.
 - اختر ألوان التعبئة والخلفية.
 - فعّل خيارات التوليد العشوائي أو التدوير أو الانحراف.
@@ -34,7 +33,6 @@ Created for designers, artists, and creative minds who love experimenting with s
 
 ## 🚀 Getting Started
 
-Simply open the `index.html` file in your browser.  
 You can:
 
 1. Set grid cell width and height
