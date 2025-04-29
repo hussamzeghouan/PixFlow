@@ -664,6 +664,8 @@
   function updateRangeValue(rangeInput, valueElementId) {
     const value = rangeInput.value;
     document.getElementById(valueElementId).textContent = value + '%';
+    // Trigger live preview
+    generateGridNow();
   }
   
   // Toggles the visibility of a settings panel
@@ -682,6 +684,9 @@
     } else {
       label.classList.remove('active');
     }
+    
+    // Trigger live preview
+    generateGridNow();
   }
   
   // Generates a random color
@@ -832,6 +837,24 @@
   // Setup event listeners when the page loads
   window.onload = function() {
     console.log("Initializing PixFlow...");
+    
+    // Set up live preview for all inputs
+    const livePreviewInputs = [
+      'columns', 'rows', 'cellWidth', 'cellHeight', 
+      'fillColor', 'bgColor', 'fillPercent', 
+      'randomSize', 'roundedCorners', 'cornerRadius'
+    ];
+    
+    livePreviewInputs.forEach(inputId => {
+      const input = document.getElementById(inputId);
+      
+      // Different event listeners based on input type
+      if (input.type === 'checkbox') {
+        input.addEventListener('change', generateGridNow);
+      } else if (input.type === 'color' || input.type === 'number') {
+        input.addEventListener('input', generateGridNow);
+      }
+    });
     
     // Set up toggle listeners
     document.querySelectorAll('.toggle-label input[type="checkbox"]').forEach(checkbox => {
