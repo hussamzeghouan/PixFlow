@@ -1,9 +1,60 @@
-// The fixed function that should correct the blank canvas issue
+<script>
+function updatePercentLabel(value) {
+  document.getElementById('percentLabel').innerText = value + '%';
+}
+function updateCornerLabel(value) {
+  document.getElementById('cornerLabel').innerText = value + '%';
+}
+function toggleSettings(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isVisible = panel.style.display === 'block';
+  panel.style.display = isVisible ? 'none' : 'block';
+  const checkboxId = panelId.replace('Settings', '');
+  const label = document.getElementById(checkboxId + 'Label');
+  if (label) {
+    if (isVisible) label.classList.remove('active');
+    else label.classList.add('active');
+  }
+}
+function getRandomColor(dark = false) {
+  if (dark) {
+    return '#' + Math.floor(Math.random() * 0x444444).toString(16).padStart(6, '0');
+  }
+  return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+}
+function applyColorPreset() {
+  const preset = document.getElementById('colorPreset').value;
+  const palette = document.getElementById('colorPalette');
+  palette.innerHTML = '';
+  let colors = [];
+  switch(preset) {
+    case 'retro': colors = ['#FF6B6B', '#4ECDC4', '#F9D423', '#FF4E50', '#556270']; break;
+    case 'ocean': colors = ['#1A535C', '#4ECDC4', '#F7FFF7', '#2B7A78', '#DEF2F1']; break;
+    case 'sunset': colors = ['#F9C80E', '#FF4365', '#5B2E5F', '#F15946', '#2C0835']; break;
+    case 'forest': colors = ['#2D3047', '#93B7BE', '#E0CA3C', '#A37B45', '#3A5311']; break;
+    default: colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
+  }
+  colors.forEach(color => {
+    const div = document.createElement('div');
+    div.className = 'color';
+    div.style.backgroundColor = color;
+    div.setAttribute('data-color', color);
+    div.addEventListener('click', function() {
+      document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
+    });
+    palette.appendChild(div);
+  });
+  if (palette.firstChild) {
+    palette.firstChild.classList.add('active');
+    document.getElementById('fillColor').value = colors[0];
+  }
+}
 function generateGrid() {
   const svg = document.getElementById('grid');
   svg.innerHTML = '';
-  
-  // Get all the settings
   const cellWidth = parseInt(document.getElementById('cellWidth').value) || 40;
   const cellHeight = parseInt(document.getElementById('cellHeight').value) || 40;
   const columns = parseInt(document.getElementById('columns').value) || 10;
@@ -12,167 +63,83 @@ function generateGrid() {
   const secondaryColor = document.getElementById('secondaryColor').value;
   const bgColor = document.getElementById('bgColor').value;
   const fillPercent = parseInt(document.getElementById('fillPercent').value) || 50;
-  
-  // Feature toggles
   const randomSize = document.getElementById('randomSize').checked;
   const roundedCorners = document.getElementById('roundedCorners').checked;
   const multiColor = document.getElementById('multiColor').checked;
   const applyShear = document.getElementById('applyShear').checked;
   const gradientFill = document.getElementById('gradientFill').checked;
-  
-  // Additional settings
   const cornerRadius = parseInt(document.getElementById('cornerRadius').value) || 10;
   const gradientStart = document.getElementById('gradientStart')?.value || '#ff6666';
   const gradientEnd = document.getElementById('gradientEnd')?.value || '#66aaff';
   const gradientDirection = document.getElementById('gradientDirection')?.value || 'horizontal';
-  
-  // Set SVG dimensions and background
-  const totalWidth = columns * cellWidth;
-  const totalHeight = rows * cellHeight;
-  
-  svg.setAttribute('width', totalWidth);
-  svg.setAttribute('height', totalHeight);
-  svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+  svg.setAttribute('width', columns * cellWidth);
+  svg.setAttribute('height', rows * cellHeight);
   svg.style.background = bgColor;
-  
-  // Create a background rectangle to ensure the SVG has the proper dimensions and background
-  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  bgRect.setAttribute('width', totalWidth);
-  bgRect.setAttribute('height', totalHeight);
-  bgRect.setAttribute('fill', bgColor);
-  svg.appendChild(bgRect);
-  
-  // If using gradient, define the gradients
   if (gradientFill) {
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     svg.appendChild(defs);
-    
-    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 
-                     gradientDirection === 'radial' ? 'radialGradient' : 'linearGradient');
+    const gradient = document.createElementNS('http://www.w3.org/2000/svg',
+      gradientDirection === 'radial' ? 'radialGradient' : 'linearGradient');
     gradient.setAttribute('id', 'cellGradient');
-    
     if (gradientDirection !== 'radial') {
-      // Set gradient direction
       switch(gradientDirection) {
-        case 'horizontal':
-          gradient.setAttribute('x1', '0%');
-          gradient.setAttribute('y1', '50%');
-          gradient.setAttribute('x2', '100%');
-          gradient.setAttribute('y2', '50%');
-          break;
-        case 'vertical':
-          gradient.setAttribute('x1', '50%');
-          gradient.setAttribute('y1', '0%');
-          gradient.setAttribute('x2', '50%');
-          gradient.setAttribute('y2', '100%');
-          break;
-        case 'diagonal':
-          gradient.setAttribute('x1', '0%');
-          gradient.setAttribute('y1', '0%');
-          gradient.setAttribute('x2', '100%');
-          gradient.setAttribute('y2', '100%');
-          break;
+        case 'horizontal': gradient.setAttribute('x1', '0%'); gradient.setAttribute('y1', '50%'); gradient.setAttribute('x2', '100%'); gradient.setAttribute('y2', '50%'); break;
+        case 'vertical': gradient.setAttribute('x1', '50%'); gradient.setAttribute('y1', '0%'); gradient.setAttribute('x2', '50%'); gradient.setAttribute('y2', '100%'); break;
+        case 'diagonal': gradient.setAttribute('x1', '0%'); gradient.setAttribute('y1', '0%'); gradient.setAttribute('x2', '100%'); gradient.setAttribute('y2', '100%'); break;
       }
     }
-    
-    // Add stops
     const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
     stop1.setAttribute('offset', '0%');
     stop1.setAttribute('stop-color', gradientStart);
-    
     const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
     stop2.setAttribute('offset', '100%');
     stop2.setAttribute('stop-color', gradientEnd);
-    
     gradient.appendChild(stop1);
     gradient.appendChild(stop2);
     defs.appendChild(gradient);
   }
-  
-  // Get available colors if using multiColor
   let colors = [];
   if (multiColor) {
     document.querySelectorAll('.color').forEach(color => {
-      const dataColor = color.getAttribute('data-color');
-      if (dataColor) {
-        colors.push(dataColor);
-      }
+      colors.push(color.getAttribute('data-color'));
     });
-    
-    // If no colors found in the palette, use default colors
-    if (colors.length === 0) {
-      colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
-    }
   }
-  
-  // Generate the grid cells
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
-      // Apply fill percentage - skip some cells randomly
       if (Math.random() * 100 > fillPercent) continue;
-      
       let width = cellWidth;
       let height = cellHeight;
-      
       if (randomSize) {
-        width = cellWidth * (0.5 + Math.random());
-        height = cellHeight * (0.5 + Math.random());
+        width *= 0.5 + Math.random();
+        height *= 0.5 + Math.random();
       }
-      
-      // Determine cell color
       let color = fillColor;
       if (multiColor && colors.length > 0) {
         color = colors[Math.floor(Math.random() * colors.length)];
       }
-      
-      // Create the rectangle
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       rect.setAttribute('x', x * cellWidth);
       rect.setAttribute('y', y * cellHeight);
       rect.setAttribute('width', width);
       rect.setAttribute('height', height);
-      
-      // Apply fill color or gradient
-      if (gradientFill) {
-        rect.setAttribute('fill', 'url(#cellGradient)');
-      } else {
-        rect.setAttribute('fill', color);
-      }
-      
-      // Apply rounded corners if enabled
+      rect.setAttribute('fill', gradientFill ? 'url(#cellGradient)' : color);
       if (roundedCorners) {
-        const rx = (cornerRadius/100) * (width/2);
-        const ry = (cornerRadius/100) * (height/2);
+        const rx = (cornerRadius / 100) * (cellWidth / 2);
+        const ry = (cornerRadius / 100) * (cellHeight / 2);
         rect.setAttribute('rx', rx);
         rect.setAttribute('ry', ry);
       }
-      
-      // Apply shearing if enabled
       if (applyShear) {
         const skewX = Math.random() * 20 - 10;
         const skewY = Math.random() * 20 - 10;
         rect.setAttribute('transform', `skewX(${skewX}) skewY(${skewY})`);
       }
-      
       svg.appendChild(rect);
     }
   }
-  
-  // Debug info to console
-  console.log(`Generated grid: ${columns}x${rows} cells of ${cellWidth}x${cellHeight}px`);
-  console.log(`Total size: ${totalWidth}x${totalHeight}px`);
-  console.log(`Fill percentage: ${fillPercent}%`);
 }
-
-// This function helps with exporting the SVG
 function exportSVG() {
   const svg = document.getElementById('grid');
-  
-  // Ensure the SVG has the correct namespace
-  if (!svg.getAttribute('xmlns')) {
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  }
-  
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svg);
   const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
@@ -181,109 +148,84 @@ function exportSVG() {
   link.href = url;
   link.download = 'pixflow-pattern.svg';
   link.click();
-  
-  // Clean up
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 100);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
-
-// This function corrects the PNG export
 function exportPNG() {
   const svg = document.getElementById('grid');
-  
-  // Ensure the SVG has the correct namespace
-  if (!svg.getAttribute('xmlns')) {
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  }
-  
-  const svgWidth = parseInt(svg.getAttribute('width'));
-  const svgHeight = parseInt(svg.getAttribute('height'));
-  
   const serializer = new XMLSerializer();
   const source = serializer.serializeToString(svg);
+  const img = new Image();
   const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
-  
-  const img = new Image();
   img.onload = function() {
     const canvas = document.createElement('canvas');
-    canvas.width = svgWidth;
-    canvas.height = svgHeight;
-    
+    canvas.width = parseInt(svg.getAttribute('width'));
+    canvas.height = parseInt(svg.getAttribute('height'));
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = document.getElementById('bgColor').value;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0);
-    
-    // Clean up the URL
     URL.revokeObjectURL(url);
-
-    // Download the PNG
-    const pngUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
-    link.href = pngUrl;
+    link.href = canvas.toDataURL('image/png');
     link.download = 'pixflow-pattern.png';
     link.click();
   };
-  
-  // Handle any errors that might occur when loading the image
-  img.onerror = function() {
-    console.error('Error loading SVG for PNG export');
-    URL.revokeObjectURL(url);
-    alert('Failed to export PNG. Please try again.');
-  };
-  
   img.src = url;
 }
-
-// Make sure this runs on page load
-window.onload = function() {
-  // Initialize labels
-  updatePercentLabel(document.getElementById('fillPercent').value);
-  if (document.getElementById('cornerRadius')) {
-    updateCornerLabel(document.getElementById('cornerRadius').value);
+function randomizeAll() {
+  document.getElementById('cellWidth').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('cellHeight').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('columns').value = Math.floor(Math.random() * 15) + 5;
+  document.getElementById('rows').value = Math.floor(Math.random() * 15) + 5;
+  const fillPercent = Math.floor(Math.random() * 80) + 20;
+  document.getElementById('fillPercent').value = fillPercent;
+  updatePercentLabel(fillPercent);
+  document.getElementById('fillColor').value = getRandomColor();
+  document.getElementById('secondaryColor').value = getRandomColor();
+  document.getElementById('bgColor').value = getRandomColor(true);
+  document.getElementById('randomSize').checked = Math.random() > 0.5;
+  document.getElementById('roundedCorners').checked = Math.random() > 0.5;
+  document.getElementById('multiColor').checked = Math.random() > 0.5;
+  document.getElementById('applyShear').checked = Math.random() > 0.5;
+  document.getElementById('gradientFill').checked = Math.random() > 0.5;
+  if (document.getElementById('roundedCorners').checked) {
+    document.getElementById('roundedCornersSettings').style.display = 'block';
+  } else {
+    document.getElementById('roundedCornersSettings').style.display = 'none';
   }
-  
-  // Set up checkbox event listeners
+  if (document.getElementById('multiColor').checked) {
+    document.getElementById('multiColorSettings').style.display = 'block';
+  } else {
+    document.getElementById('multiColorSettings').style.display = 'none';
+  }
+  if (document.getElementById('gradientFill').checked) {
+    document.getElementById('gradientSettings').style.display = 'block';
+  } else {
+    document.getElementById('gradientSettings').style.display = 'none';
+  }
+  generateGrid();
+}
+window.onload = function() {
+  updatePercentLabel(document.getElementById('fillPercent').value);
+  updateCornerLabel(document.getElementById('cornerRadius').value);
   document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
       const label = this.parentElement;
-      if (this.checked) {
-        label.classList.add('active');
-      } else {
-        label.classList.remove('active');
-      }
-      
-      // For settings panels
-      if (this.id === 'roundedCorners') {
-        const panel = document.getElementById('roundedCornersSettings');
-        if (panel) panel.style.display = this.checked ? 'block' : 'none';
-      } else if (this.id === 'multiColor') {
-        const panel = document.getElementById('multiColorSettings');
-        if (panel) panel.style.display = this.checked ? 'block' : 'none';
-      } else if (this.id === 'gradientFill') {
-        const panel = document.getElementById('gradientSettings');
-        if (panel) panel.style.display = this.checked ? 'block' : 'none';
-      }
+      if (this.checked) label.classList.add('active');
+      else label.classList.remove('active');
+      if (this.id === 'roundedCorners') document.getElementById('roundedCornersSettings').style.display = this.checked ? 'block' : 'none';
+      if (this.id === 'multiColor') document.getElementById('multiColorSettings').style.display = this.checked ? 'block' : 'none';
+      if (this.id === 'gradientFill') document.getElementById('gradientSettings').style.display = this.checked ? 'block' : 'none';
     });
   });
-  
-  // Set up color palette interactions
   document.querySelectorAll('.color').forEach(color => {
     color.addEventListener('click', function() {
       document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
-      const fillColorInput = document.getElementById('fillColor');
-      if (fillColorInput) {
-        fillColorInput.value = this.getAttribute('data-color');
-      }
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
     });
   });
-  
-  // Generate initial grid
   generateGrid();
-  
-  // Log that initialization is complete
-  console.log('PixFlow initialized successfully');
-};
+}
+</script>
