@@ -1,4 +1,19 @@
 <!DOCTYPE html>
+<!--
+/**
+ * Project: PixFlow - Advanced Pixel Pattern Generator
+ * Version: 1.0.0
+ * 
+ * Author: Hussam Zeghouan
+ * Website: https://linktr.ee/hsm_ze
+ * Behance: https://www.behance.net/hsm_ze
+ * Instagram: https://instagram.com/hsm_ze
+ * 
+ * Description: Create stunning pixel patterns
+ * 
+ * Copyright (c) 2025 Hussam Zeghouan. All rights reserved.
+ */
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -385,11 +400,36 @@
     
     .settings-panel {
       padding: 15px;
-      background: var(--bg-input);
+      background: rgba(15, 15, 20, 0.8);
       border-radius: 12px;
       margin-top: 15px;
       display: none;
-      border: 1px solid var(--border);
+      border: 1px solid var(--primary-dark);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    #cornerRadiusControl {
+      position: relative;
+    }
+    
+    #cornerRadiusControl label {
+      color: var(--text);
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+    
+    #cornerRadiusValue {
+      position: absolute;
+      top: -35px; /* تم تغيير هذه القيمة لرفع النسبة أعلى الشريط */
+      right: 10px;
+      background: var(--primary);
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
     
     /* Responsive adjustments */
@@ -450,7 +490,7 @@
   <div class="container">
     <div class="header">
       <h1>PixFlow</h1>
-      <p>Create stunning pixel patterns with powerful customization tools</p>
+      <p>Create stunning pixel patterns</p>
     </div>
     
     <div class="card">
@@ -552,11 +592,12 @@
   </div>
   
   <footer>
-    <p>Designed with ❤️ for creative minds</p>
-    <div>
-      <a href="#" target="_blank"><i class="fab fa-github"></i></a>
-      <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-      <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+    <p>Designed ❤️ — for all creative minds</p>
+    <p>Created by Hussam Zeghouan</p>
+    <div style="margin-top: 15px;">
+      <a href="https://instagram.com/hsm_ze" target="_blank" style="margin: 0 10px;"><i class="fab fa-instagram" style="font-size: 24px;"></i></a>
+      <a href="https://www.behance.net/hsm_ze" target="_blank" style="margin: 0 10px;"><i class="fab fa-behance" style="font-size: 24px;"></i></a>
+      <a href="https://linktr.ee/hsm_ze" target="_blank" style="margin: 0 10px;"><i class="fas fa-link" style="font-size: 24px;"></i></a>
     </div>
   </footer>
 
