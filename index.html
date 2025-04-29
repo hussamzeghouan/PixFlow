@@ -2,525 +2,851 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PixFlow Pattern Generator</title>
+  <title>PixFlow - Enhanced</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
+    :root {
+      --primary: #18A0FB;
+      --primary-hover: #0d8ae2;
+      --background: #121212;
+      --card-bg: #1e1e1e;
+      --text: #f5f5f5;
+      --text-secondary: #bbb;
+      --input-bg: #2b2b2b;
+      --border: #333;
+    }
     body {
-      font-family: Arial, sans-serif;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #f0f0f0;
+      margin: 0;
+      padding: 30px;
+      background: var(--background);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
     }
     h1 {
+      font-size: 48px;
+      margin-bottom: 5px;
       text-align: center;
-      color: #333;
+      background: linear-gradient(90deg, #18A0FB, #8A2BE2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 3px 10px rgba(24, 160, 251, 0.3);
+    }
+    .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      text-align: center;
     }
     .container {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      transform: translateY(-2px);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .card-header i {
+      font-size: 20px;
+      margin-right: 10px;
+      color: var(--primary);
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .controls-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .control-group {
+      flex: 1;
+      min-width: 280px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+    }
+    .control-group h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+    .control-group h3 i {
+      margin-right: 8px;
+    }
+    .controls, .checkboxes {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
+      justify-content: flex-start;
     }
-    .controls {
-      flex: 1;
-      min-width: 300px;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .preview {
-      flex: 2;
-      min-width: 400px;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    .controls label, .checkboxes label {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      font-size: 14px;
+      width: 120px;
     }
-    .control-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input[type="number"], input[type="color"], select {
+    input[type="number"], input[type="range"] {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: #fff;
       width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    .checkboxes label {
-      display: inline-flex;
-      align-items: center;
-      margin-right: 10px;
-      font-weight: normal;
-      cursor: pointer;
-      padding: 5px 10px;
-      border-radius: 20px;
-      background: #eee;
       transition: all 0.2s;
     }
+    input[type="number"]:focus, input[type="range"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 160, 251, 0.2);
+    }
+    input[type="color"] {
+      width: 100%;
+      height: 40px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      background: var(--input-bg);
+      border-radius: 4px;
+      outline: none;
+      padding: 0;
+      margin: 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 5px rgba(24, 160, 251, 0.5);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(24, 160, 251, 0.5);
+    }
+    .checkboxes label {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      width: auto;
+      cursor: pointer;
+      padding: 8px 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .checkboxes label:hover {
+      background: rgba(24, 160, 251, 0.1);
+    }
     .checkboxes label.active {
-      background: #4CAF50;
-      color: white;
+      background: rgba(24, 160, 251, 0.15);
     }
-    .checkboxes input[type="checkbox"] {
-      margin-right: 5px;
+    .checkboxes i {
+      color: var(--text-secondary);
+      font-size: 18px;
     }
-    .settings-panel {
-      background: #f9f9f9;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-      display: none;
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
     }
     button {
-      background: #4CAF50;
+      background-color: var(--primary);
       color: white;
+      padding: 12px 25px;
       border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-weight: 600;
       cursor: pointer;
-      margin-top: 10px;
-      font-size: 16px;
-      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
     }
     button:hover {
-      background: #45a049;
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 160, 251, 0.3);
+    }
+    button i {
+      font-size: 18px;
+    }
+    #grid-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    #grid {
+      margin: 20px auto;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: block;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    .settings-panel {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      display: none;
+    }
+    footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 14px;
+      text-align: center;
+      padding: 20px 0;
+    }
+    footer a {
+      color: #888;
+      margin: 0 10px;
+      font-size: 24px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    footer a:hover {
+      color: var(--primary);
     }
     .color-palette {
       display: flex;
       flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 10px;
+      gap: 10px;
+      margin-top: 15px;
     }
     .color {
       width: 30px;
       height: 30px;
-      border-radius: 50%;
+      border-radius: 6px;
       cursor: pointer;
+      transition: all 0.2s;
       border: 2px solid transparent;
     }
-    .color.active {
-      border-color: #333;
+    .color:hover {
       transform: scale(1.1);
     }
-    .actions {
-      margin-top: 20px;
+    .color.active {
+      border-color: white;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+    .hidden {
+      display: none;
+    }
+    .flex-between {
       display: flex;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
     }
-    .actions button {
-      flex: 1;
+    .preset-select {
+      padding: 10px;
+      background: var(--input-bg);
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
     }
-    #fillPercentLabel, #cornerRadiusLabel {
-      display: inline-block;
-      width: 30px;
-      text-align: center;
-    }
-    #grid {
-      border: 1px solid #ddd;
-      margin-top: 20px;
+    .preset-select:focus {
+      outline: none;
+      border-color: var(--primary);
     }
   </style>
 </head>
+
 <body>
-  <h1>PixFlow Pattern Generator</h1>
-  
-  <div class="container">
-    <div class="controls">
+
+<h1>PixFlow</h1>
+<p class="tagline">Advanced Pixel Pattern Generator</p>
+
+<div class="container">
+  <!-- Main Controls Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-sliders"></i>
+      <h2>Pattern Settings</h2>
+    </div>
+    
+    <div class="controls-container">
+      <!-- Grid Controls -->
       <div class="control-group">
-        <label for="columns">Columns:</label>
-        <input type="number" id="columns" value="10" min="1" max="50">
-        
-        <label for="rows">Rows:</label>
-        <input type="number" id="rows" value="10" min="1" max="50">
-        
-        <label for="cellWidth">Cell Width (px):</label>
-        <input type="number" id="cellWidth" value="40" min="10" max="200">
-        
-        <label for="cellHeight">Cell Height (px):</label>
-        <input type="number" id="cellHeight" value="40" min="10" max="200">
-      </div>
-      
-      <div class="control-group">
-        <label for="fillColor">Primary Color:</label>
-        <input type="color" id="fillColor" value="#ff6666">
-        
-        <label for="secondaryColor">Secondary Color:</label>
-        <input type="color" id="secondaryColor" value="#66aaff">
-        
-        <label for="bgColor">Background Color:</label>
-        <input type="color" id="bgColor" value="#ffffff">
-      </div>
-      
-      <div class="control-group">
-        <label for="fillPercent">Fill Percentage: <span id="fillPercentLabel">50</span>%</label>
-        <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
-      </div>
-      
-      <div class="control-group checkboxes">
-        <label class="toggle"><input type="checkbox" id="randomSize"> Random Size</label>
-        <label class="toggle"><input type="checkbox" id="roundedCorners"> Rounded</label>
-        <label class="toggle"><input type="checkbox" id="multiColor"> Multi-Color</label>
-        <label class="toggle"><input type="checkbox" id="applyShear"> Shear</label>
-        <label class="toggle"><input type="checkbox" id="gradientFill"> Gradient</label>
-      </div>
-      
-      <!-- Rounded Corners Settings -->
-      <div id="roundedCornersSettings" class="settings-panel">
-        <label for="cornerRadius">Corner Radius: <span id="cornerRadiusLabel">10</span>%</label>
-        <input type="range" id="cornerRadius" min="0" max="100" value="10" oninput="updateCornerLabel(this.value)">
-      </div>
-      
-      <!-- Multi-Color Settings -->
-      <div id="multiColorSettings" class="settings-panel">
-        <label>Color Palette:</label>
-        <div class="color-palette">
-          <div class="color active" data-color="#ff6666" style="background-color: #ff6666;"></div>
-          <div class="color" data-color="#66aaff" style="background-color: #66aaff;"></div>
-          <div class="color" data-color="#66ff66" style="background-color: #66ff66;"></div>
-          <div class="color" data-color="#ffff66" style="background-color: #ffff66;"></div>
-          <div class="color" data-color="#ff66ff" style="background-color: #ff66ff;"></div>
+        <h3><i class="fas fa-th"></i> Grid Dimensions</h3>
+        <div class="controls">
+          <label title="Cell Width in pixels">
+            Cell Width
+            <input type="number" id="cellWidth" value="40" min="5" max="200">
+          </label>
+          <label title="Cell Height in pixels">
+            Cell Height
+            <input type="number" id="cellHeight" value="40" min="5" max="200">
+          </label>
+          <label title="Number of Columns">
+            Columns
+            <input type="number" id="columns" value="10" min="1" max="50">
+          </label>
+          <label title="Number of Rows">
+            Rows
+            <input type="number" id="rows" value="10" min="1" max="50">
+          </label>
         </div>
       </div>
       
-      <!-- Gradient Settings -->
-      <div id="gradientSettings" class="settings-panel">
-        <label for="gradientStart">Gradient Start:</label>
-        <input type="color" id="gradientStart" value="#ff6666">
-        
-        <label for="gradientEnd">Gradient End:</label>
-        <input type="color" id="gradientEnd" value="#66aaff">
-        
-        <label for="gradientDirection">Direction:</label>
-        <select id="gradientDirection">
-          <option value="horizontal">Horizontal</option>
-          <option value="vertical">Vertical</option>
-          <option value="diagonal">Diagonal</option>
-          <option value="radial">Radial</option>
+      <!-- Color Controls -->
+      <div class="control-group">
+        <h3><i class="fas fa-palette"></i> Color Settings</h3>
+        <div class="controls">
+          <label title="Fill Color for cells">
+            Fill Color
+            <input type="color" id="fillColor" value="#ff6666">
+          </label>
+          <label title="Background Color">
+            Background
+            <input type="color" id="bgColor" value="#121212">
+          </label>
+          <label title="Secondary Color for patterns">
+            Secondary
+            <input type="color" id="secondaryColor" value="#66aaff">
+          </label>
+          <label title="Fill Percentage">
+            Fill %
+            <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
+            <span id="percentLabel">50%</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Style Controls Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-brush"></i>
+      <h2>Pattern Style</h2>
+    </div>
+    
+    <div class="checkboxes">
+      <label title="Generate cells with random sizes" id="randomSizeLabel">
+        <input type="checkbox" id="randomSize"> <i class="fas fa-dice"></i> Random Size
+      </label>
+      <label title="Apply rounded corners to cells" id="roundedCornersLabel">
+        <input type="checkbox" id="roundedCorners" onchange="toggleSettings('roundedCornersSettings')"> 
+        <i class="fas fa-circle"></i> Rounded Corners
+      </label>
+      <label title="Use multiple colors" id="multiColorLabel">
+        <input type="checkbox" id="multiColor" onchange="toggleSettings('multiColorSettings')"> 
+        <i class="fas fa-palette"></i> Multi-Color
+      </label>
+      <label title="Apply shearing effect" id="applyShearLabel">
+        <input type="checkbox" id="applyShear"> 
+        <i class="fas fa-wave-square"></i> Shear
+      </label>
+      <label title="Create patterns with gradients" id="gradientFillLabel">
+        <input type="checkbox" id="gradientFill" onchange="toggleSettings('gradientSettings')"> 
+        <i class="fas fa-paint-roller"></i> Gradient
+      </label>
+    </div>
+    
+    <!-- Rounded Corners Settings -->
+    <div id="roundedCornersSettings" class="settings-panel">
+      <label title="Corner Radius Percentage">
+        Corner Radius %
+        <input type="range" id="cornerRadius" min="0" max="50" value="10" oninput="updateCornerLabel(this.value)">
+        <span id="cornerLabel">10%</span>
+      </label>
+    </div>
+    
+    <!-- Multi-Color Settings -->
+    <div id="multiColorSettings" class="settings-panel">
+      <div class="flex-between">
+        <h3>Color Palette</h3>
+        <select id="colorPreset" class="preset-select" onchange="applyColorPreset()">
+          <option value="custom">Custom</option>
+          <option value="retro">Retro Vibes</option>
+          <option value="ocean">Ocean Depths</option>
+          <option value="sunset">Sunset Glow</option>
+          <option value="forest">Forest Tones</option>
         </select>
       </div>
-      
-      <button onclick="generateGrid()">Generate Pattern</button>
-      
-      <div class="actions">
-        <button onclick="exportSVG()">Export SVG</button>
-        <button onclick="exportPNG()">Export PNG</button>
+      <div class="color-palette" id="colorPalette">
+        <div class="color active" style="background-color: #ff6666;" data-color="#ff6666"></div>
+        <div class="color" style="background-color: #66aaff;" data-color="#66aaff"></div>
+        <div class="color" style="background-color: #66ff66;" data-color="#66ff66"></div>
+        <div class="color" style="background-color: #ffff66;" data-color="#ffff66"></div>
+        <div class="color" style="background-color: #ff66ff;" data-color="#ff66ff"></div>
       </div>
     </div>
     
-    <div class="preview">
-      <h2>Preview</h2>
-      <svg id="grid" width="400" height="400" viewBox="0 0 400 400"></svg>
+    <!-- Gradient Settings -->
+    <div id="gradientSettings" class="settings-panel">
+      <div class="controls">
+        <label title="Start Color">
+          Start Color
+          <input type="color" id="gradientStart" value="#ff6666">
+        </label>
+        <label title="End Color">
+          End Color
+          <input type="color" id="gradientEnd" value="#66aaff">
+        </label>
+        <label title="Gradient Type">
+          Direction
+          <select id="gradientDirection" class="preset-select">
+            <option value="horizontal">Horizontal</option>
+            <option value="vertical">Vertical</option>
+            <option value="diagonal">Diagonal</option>
+            <option value="radial">Radial</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Actions Card -->
+  <div class="card">
+    <div class="btn-container">
+      <button onclick="generateGrid()"><i class="fas fa-magic"></i> Generate Pattern</button>
+      <button onclick="exportSVG()"><i class="fas fa-file-code"></i> Export SVG</button>
+      <button onclick="exportPNG()"><i class="fas fa-file-image"></i> Export PNG</button>
+      <button onclick="randomizeAll()"><i class="fas fa-random"></i> Randomize All</button>
     </div>
   </div>
 
-  <script>
-    // Update labels for sliders
-    function updatePercentLabel(value) {
-      document.getElementById('fillPercentLabel').textContent = value;
+  <!-- Grid Display -->
+  <div id="grid-container">
+    <svg id="grid" width="800" height="800" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+</div>
+
+<footer>
+  Designed with ❤️ — for all creative minds<br><br>
+  <small>Created by <strong>Hussam Zeghouan</strong> | Enhanced Version</small><br><br>
+  <a href="https://instagram.com/hsm_ze" target="_blank"><i class="fab fa-instagram"></i></a>
+  <a href="https://behance.net/hsm_ze" target="_blank"><i class="fab fa-behance"></i></a>
+  <a href="https://linktr.ee/hsm_ze" target="_blank"><i class="fas fa-link"></i></a>
+</footer>
+
+<script>
+// Update label functions
+function updatePercentLabel(value) {
+  document.getElementById('percentLabel').innerText = value + '%';
+}
+
+function updateCornerLabel(value) {
+  document.getElementById('cornerLabel').innerText = value + '%';
+}
+
+// Toggle settings panels
+function toggleSettings(panelId) {
+  const panel = document.getElementById(panelId);
+  const isVisible = panel.style.display === 'block';
+  panel.style.display = isVisible ? 'none' : 'block';
+  
+  // If this is the checkbox being toggled, update its label class
+  const checkboxId = panelId.replace('Settings', '');
+  const label = document.getElementById(checkboxId + 'Label');
+  if (label) {
+    if (isVisible) {
+      label.classList.remove('active');
+    } else {
+      label.classList.add('active');
+    }
+  }
+}
+
+// Handle checkbox label highlighting
+document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const label = this.parentElement;
+    if (this.checked) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
+  });
+});
+
+// Color palette selection
+document.querySelectorAll('.color').forEach(color => {
+  color.addEventListener('click', function() {
+    document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('fillColor').value = this.getAttribute('data-color');
+  });
+});
+
+// Color presets
+function applyColorPreset() {
+  const preset = document.getElementById('colorPreset').value;
+  const palette = document.getElementById('colorPalette');
+  palette.innerHTML = '';
+  
+  let colors = [];
+  
+  switch(preset) {
+    case 'retro':
+      colors = ['#FF6B6B', '#4ECDC4', '#F9D423', '#FF4E50', '#556270'];
+      break;
+    case 'ocean':
+      colors = ['#1A535C', '#4ECDC4', '#F7FFF7', '#2B7A78', '#DEF2F1'];
+      break;
+    case 'sunset':
+      colors = ['#F9C80E', '#FF4365', '#5B2E5F', '#F15946', '#2C0835'];
+      break;
+    case 'forest':
+      colors = ['#2D3047', '#93B7BE', '#E0CA3C', '#A37B45', '#3A5311'];
+      break;
+    default:
+      colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
+  }
+  
+  colors.forEach(color => {
+    const div = document.createElement('div');
+    div.className = 'color';
+    div.style.backgroundColor = color;
+    div.setAttribute('data-color', color);
+    div.addEventListener('click', function() {
+      document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
+    });
+    palette.appendChild(div);
+  });
+  
+  // Set the first color as active
+  if (palette.firstChild) {
+    palette.firstChild.classList.add('active');
+    document.getElementById('fillColor').value = colors[0];
+  }
+}
+
+// Random all settings
+function randomizeAll() {
+  // Randomize dimensions
+  document.getElementById('cellWidth').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('cellHeight').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('columns').value = Math.floor(Math.random() * 15) + 5;
+  document.getElementById('rows').value = Math.floor(Math.random() * 15) + 5;
+  
+  // Randomize fill percent
+  const fillPercent = Math.floor(Math.random() * 80) + 20;
+  document.getElementById('fillPercent').value = fillPercent;
+  updatePercentLabel(fillPercent);
+  
+  // Randomize colors
+  document.getElementById('fillColor').value = getRandomColor();
+  document.getElementById('secondaryColor').value = getRandomColor();
+  document.getElementById('bgColor').value = getRandomColor(true);
+  
+  // Randomize features
+  document.getElementById('randomSize').checked = Math.random() > 0.5;
+  document.getElementById('roundedCorners').checked = Math.random() > 0.5;
+  document.getElementById('multiColor').checked = Math.random() > 0.5;
+  document.getElementById('applyShear').checked = Math.random() > 0.5;
+  document.getElementById('gradientFill').checked = Math.random() > 0.5;
+  
+  // Update settings panels
+  if (document.getElementById('roundedCorners').checked) {
+    document.getElementById('roundedCornersSettings').style.display = 'block';
+  } else {
+    document.getElementById('roundedCornersSettings').style.display = 'none';
+  }
+  
+  if (document.getElementById('multiColor').checked) {
+    document.getElementById('multiColorSettings').style.display = 'block';
+  } else {
+    document.getElementById('multiColorSettings').style.display = 'none';
+  }
+  
+  if (document.getElementById('gradientFill').checked) {
+    document.getElementById('gradientSettings').style.display = 'block';
+  } else {
+    document.getElementById('gradientSettings').style.display = 'none';
+  }
+  
+  // Update UI state
+  document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
+    const label = checkbox.parentElement;
+    if (checkbox.checked) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
+  });
+  
+  // Generate the grid
+  generateGrid();
+}
+
+function exportSVG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  if (!svg.getAttribute('xmlns')) {
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  }
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pixflow-pattern.svg';
+  link.click();
+  
+  // تنظيف
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+function exportPNG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  if (!svg.getAttribute('xmlns')) {
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  }
+  
+  const svgWidth = parseInt(svg.getAttribute('width'));
+  const svgHeight = parseInt(svg.getAttribute('height'));
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = svgWidth;
+    canvas.height = svgHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    // تنظيف عنوان URL
+    URL.revokeObjectURL(url);
+
+    // تنزيل ملف PNG
+    const pngUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = pngUrl;
+    link.download = 'pixflow-pattern.png';
+    link.click();
+  };
+  
+  // التعامل مع أي أخطاء قد تحدث عند تحميل الصورة
+  img.onerror = function() {
+    console.error('خطأ في تحميل SVG لتصدير PNG');
+    URL.revokeObjectURL(url);
+    alert('فشل تصدير PNG. الرجاء المحاولة مرة أخرى.');
+  };
+  
+  img.src = url;
+}
+
+function getRandomColor(dark = false) {
+  if (dark) {
+    // Generate darker colors for background
+    return '#' + Math.floor(Math.random() * 0x444444).toString(16).padStart(6, '0');
+  }
+  return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+}
+
+// وظيفة توليد الشبكة الرئيسية المُصلَحة
+function generateGrid() {
+  const svg = document.getElementById('grid');
+  svg.innerHTML = '';  // مسح المحتوى السابق
+  
+  // الحصول على جميع الإعدادات
+  const cellWidth = parseInt(document.getElementById('cellWidth').value) || 40;
+  const cellHeight = parseInt(document.getElementById('cellHeight').value) || 40;
+  const columns = parseInt(document.getElementById('columns').value) || 10;
+  const rows = parseInt(document.getElementById('rows').value) || 10;
+  const fillColor = document.getElementById('fillColor').value;
+  const secondaryColor = document.getElementById('secondaryColor').value;
+  const bgColor = document.getElementById('bgColor').value;
+  const fillPercent = parseInt(document.getElementById('fillPercent').value) || 50;
+  
+  // تبديل الميزات
+  const randomSize = document.getElementById('randomSize').checked;
+  const roundedCorners = document.getElementById('roundedCorners').checked;
+  const multiColor = document.getElementById('multiColor').checked;
+  const applyShear = document.getElementById('applyShear').checked;
+  const gradientFill = document.getElementById('gradientFill').checked;
+  
+  // إعدادات إضافية
+  const cornerRadius = parseInt(document.getElementById('cornerRadius')?.value) || 10;
+  const gradientStart = document.getElementById('gradientStart')?.value || '#ff6666';
+  const gradientEnd = document.getElementById('gradientEnd')?.value || '#66aaff';
+  const gradientDirection = document.getElementById('gradientDirection')?.value || 'horizontal';
+  
+  // تعيين أبعاد وخلفية SVG
+  const totalWidth = columns * cellWidth;
+  const totalHeight = rows * cellHeight;
+  
+  svg.setAttribute('width', totalWidth);
+  svg.setAttribute('height', totalHeight);
+  svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
+  svg.style.background = bgColor;
+  
+  // إضافة مستطيل الخلفية للتأكد من أن SVG يحتوي على الأبعاد والخلفية المناسبة
+  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bgRect.setAttribute('width', totalWidth);
+  bgRect.setAttribute('height', totalHeight);
+  bgRect.setAttribute('fill', bgColor);
+  svg.appendChild(bgRect);
+  
+  // إذا كنت تستخدم التدرج، قم بتعريف التدرجات
+  if (gradientFill) {
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    svg.appendChild(defs);
+    
+    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 
+                     gradientDirection === 'radial' ? 'radialGradient' : 'linearGradient');
+    gradient.setAttribute('id', 'cellGradient');
+    
+    if (gradientDirection !== 'radial') {
+      // Set gradient direction
+      switch(gradientDirection) {
+        case 'horizontal':
+          gradient.setAttribute('x1', '0%');
+          gradient.setAttribute('y1', '50%');
+          gradient.setAttribute('x2', '100%');
+          gradient.setAttribute('y2', '50%');
+          break;
+        case 'vertical':
+          gradient.setAttribute('x1', '50%');
+          gradient.setAttribute('y1', '0%');
+          gradient.setAttribute('x2', '50%');
+          gradient.setAttribute('y2', '100%');
+          break;
+        case 'diagonal':
+          gradient.setAttribute('x1', '0%');
+          gradient.setAttribute('y1', '0%');
+          gradient.setAttribute('x2', '100%');
+          gradient.setAttribute('y2', '100%');
+          break;
+      }
     }
     
-    function updateCornerLabel(value) {
-      document.getElementById('cornerRadiusLabel').textContent = value;
-    }
+    // إضافة نقاط التوقف
+    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', gradientStart);
     
-    // The fixed function that should correct the blank canvas issue
-    function generateGrid() {
-      const svg = document.getElementById('grid');
-      svg.innerHTML = '';
+    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop2.setAttribute('offset', '100%');
+    stop2.setAttribute('stop-color', gradientEnd);
+    
+    gradient.appendChild(stop1);
+    gradient.appendChild(stop2);
+    defs.appendChild(gradient);
+  }
+  
+  // الحصول على الألوان المتاحة في حالة استخدام متعدد الألوان
+  let colors = [];
+  if (multiColor) {
+    document.querySelectorAll('.color').forEach(color => {
+      const dataColor = color.getAttribute('data-color');
+      if (dataColor) {
+        colors.push(dataColor);
+      }
+    });
+    
+    // إذا لم يتم العثور على ألوان في لوحة الألوان، استخدم الألوان الافتراضية
+    if (colors.length === 0) {
+      colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
+    }
+  }
+  
+  // توليد خلايا الشبكة
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      // تطبيق نسبة الملء - تخطي بعض الخلايا بشكل عشوائي
+      if (Math.random() * 100 > fillPercent) continue;
       
-      // Get all the settings
-      const cellWidth = parseInt(document.getElementById('cellWidth').value) || 40;
-      const cellHeight = parseInt(document.getElementById('cellHeight').value) || 40;
-      const columns = parseInt(document.getElementById('columns').value) || 10;
-      const rows = parseInt(document.getElementById('rows').value) || 10;
-      const fillColor = document.getElementById('fillColor').value;
-      const secondaryColor = document.getElementById('secondaryColor').value;
-      const bgColor = document.getElementById('bgColor').value;
-      const fillPercent = parseInt(document.getElementById('fillPercent').value) || 50;
+      let width = cellWidth;
+      let height = cellHeight;
       
-      // Feature toggles
-      const randomSize = document.getElementById('randomSize').checked;
-      const roundedCorners = document.getElementById('roundedCorners').checked;
-      const multiColor = document.getElementById('multiColor').checked;
-      const applyShear = document.getElementById('applyShear').checked;
-      const gradientFill = document.getElementById('gradientFill').checked;
+      // تطبيق الحجم العشوائي إذا تم تمكينه
+      if (randomSize) {
+        width = cellWidth * (0.5 + Math.random());
+        height = cellHeight * (0.5 + Math.random());
+      }
       
-      // Additional settings
-      const cornerRadius = parseInt(document.getElementById('cornerRadius').value) || 10;
-      const gradientStart = document.getElementById('gradientStart')?.value || '#ff6666';
-      const gradientEnd = document.getElementById('gradientEnd')?.value || '#66aaff';
-      const gradientDirection = document.getElementById('gradientDirection')?.value || 'horizontal';
+      // تحديد لون الخلية
+      let color = fillColor;
+      if (multiColor && colors.length > 0) {
+        color = colors[Math.floor(Math.random() * colors.length)];
+      }
       
-      // Set SVG dimensions and background
-      const totalWidth = columns * cellWidth;
-      const totalHeight = rows * cellHeight;
+      // إنشاء المستطيل
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', x * cellWidth);
+      rect.setAttribute('y', y * cellHeight);
+      rect.setAttribute('width', width);
+      rect.setAttribute('height', height);
       
-      svg.setAttribute('width', totalWidth);
-      svg.setAttribute('height', totalHeight);
-      svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
-      svg.style.background = bgColor;
-      
-      // Create a background rectangle to ensure the SVG has the proper dimensions and background
-      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-      bgRect.setAttribute('width', totalWidth);
-      bgRect.setAttribute('height', totalHeight);
-      bgRect.setAttribute('fill', bgColor);
-      svg.appendChild(bgRect);
-      
-      // If using gradient, define the gradients
+      // تطبيق لون التعبئة أو التدرج
       if (gradientFill) {
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        svg.appendChild(defs);
-        
-        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 
-                         gradientDirection === 'radial' ? 'radialGradient' : 'linearGradient');
-        gradient.setAttribute('id', 'cellGradient');
-        
-        if (gradientDirection !== 'radial') {
-          // Set gradient direction
-          switch(gradientDirection) {
-            case 'horizontal':
-              gradient.setAttribute('x1', '0%');
-              gradient.setAttribute('y1', '50%');
-              gradient.setAttribute('x2', '100%');
-              gradient.setAttribute('y2', '50%');
-              break;
-            case 'vertical':
-              gradient.setAttribute('x1', '50%');
-              gradient.setAttribute('y1', '0%');
-              gradient.setAttribute('x2', '50%');
-              gradient.setAttribute('y2', '100%');
-              break;
-            case 'diagonal':
-              gradient.setAttribute('x1', '0%');
-              gradient.setAttribute('y1', '0%');
-              gradient.setAttribute('x2', '100%');
-              gradient.setAttribute('y2', '100%');
-              break;
-          }
-        }
-        
-        // Add stops
-        const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop1.setAttribute('offset', '0%');
-        stop1.setAttribute('stop-color', gradientStart);
-        
-        const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-        stop2.setAttribute('offset', '100%');
-        stop2.setAttribute('stop-color', gradientEnd);
-        
-        gradient.appendChild(stop1);
-        gradient.appendChild(stop2);
-        defs.appendChild(gradient);
+        rect.setAttribute('fill', 'url(#cellGradient)');
+      } else {
+        rect.setAttribute('fill', color);
       }
       
-      // Get available colors if using multiColor
-      let colors = [];
-      if (multiColor) {
-        document.querySelectorAll('.color').forEach(color => {
-          const dataColor = color.getAttribute('data-color');
-          if (dataColor) {
-            colors.push(dataColor);
-          }
-        });
-        
-        // If no colors found in the palette, use default colors
-        if (colors.length === 0) {
-          colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
-        }
+      // تطبيق الزوايا المستديرة إذا تم تمكينها
+      if (roundedCorners) {
+        const rx = (cornerRadius/100) * (width/2);
+        const ry = (cornerRadius/100) * (height/2);
+        rect.setAttribute('rx', rx);
+        rect.setAttribute('ry', ry);
       }
       
-      // Generate the grid cells
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < columns; x++) {
-          // Apply fill percentage - skip some cells randomly
-          if (Math.random() * 100 > fillPercent) continue;
-          
-          let width = cellWidth;
-          let height = cellHeight;
-          
-          if (randomSize) {
-            width = cellWidth * (0.5 + Math.random());
-            height = cellHeight * (0.5 + Math.random());
-          }
-          
-          // Determine cell color
-          let color = fillColor;
-          if (multiColor && colors.length > 0) {
-            color = colors[Math.floor(Math.random() * colors.length)];
-          }
-          
-          // Create the rectangle
-          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          rect.setAttribute('x', x * cellWidth);
-          rect.setAttribute('y', y * cellHeight);
-          rect.setAttribute('width', width);
-          rect.setAttribute('height', height);
-          
-          // Apply fill color or gradient
-          if (gradientFill) {
-            rect.setAttribute('fill', 'url(#cellGradient)');
-          } else {
-            rect.setAttribute('fill', color);
-          }
-          
-          // Apply rounded corners if enabled
-          if (roundedCorners) {
-            const rx = (cornerRadius/100) * (width/2);
-            const ry = (cornerRadius/100) * (height/2);
-            rect.setAttribute('rx', rx);
-            rect.setAttribute('ry', ry);
-          }
-          
-          // Apply shearing if enabled
-          if (applyShear) {
-            const skewX = Math.random() * 20 - 10;
-            const skewY = Math.random() * 20 - 10;
-            rect.setAttribute('transform', `skewX(${skewX}) skewY(${skewY})`);
-          }
-          
-          svg.appendChild(rect);
-        }
+      // تطبيق الانحراف إذا تم تمكينه
+      if (applyShear) {
+        const skewX = Math.random() * 20 - 10;
+        const skewY = Math.random() * 20 - 10;
+        rect.setAttribute('transform', `skewX(${skewX}) skewY(${skewY})`);
       }
       
-      // Debug info to console
-      console.log(`Generated grid: ${columns}x${rows} cells of ${cellWidth}x${cellHeight}px`);
-      console.log(`Total size: ${totalWidth}x${totalHeight}px`);
-      console.log(`Fill percentage: ${fillPercent}%`);
-    }
-
-    // This function helps with exporting the SVG
-    function exportSVG() {
-      const svg = document.getElementById('grid');
-      
-      // Ensure the SVG has the correct namespace
-      if (!svg.getAttribute('xmlns')) {
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      }
-      
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
-      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'pixflow-pattern.svg';
-      link.click();
-      
-      // Clean up
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 100);
-    }
-
-    // This function corrects the PNG export
-    function exportPNG() {
-      const svg = document.getElementById('grid');
-      
-      // Ensure the SVG has the correct namespace
-      if (!svg.getAttribute('xmlns')) {
-        svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      }
-      
-      const svgWidth = parseInt(svg.getAttribute('width'));
-      const svgHeight = parseInt(svg.getAttribute('height'));
-      
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
-      const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
-      
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        canvas.width = svgWidth;
-        canvas.height = svgHeight;
-        
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = document.getElementById('bgColor').value;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        
-        // Clean up the URL
-        URL.revokeObjectURL(url);
-
-        // Download the PNG
-        const pngUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = pngUrl;
-        link.download = 'pixflow-pattern.png';
-        link.click();
-      };
-      
-      // Handle any errors that might occur when loading the image
-      img.onerror = function() {
-        console.error('Error loading SVG for PNG export');
-        URL.revokeObjectURL(url);
-        alert('Failed to export PNG. Please try again.');
-      };
-      
-      img.src = url;
-    }
-
-    // Make sure this runs on page load
-    window.onload = function() {
-      // Initialize labels
-      updatePercentLabel(document.getElementById('fillPercent').value);
-      if (document.getElementById('cornerRadius')) {
-        updateCornerLabel(document.getElementById('cornerRadius').value);
-      }
-      
-      // Set up checkbox event listeners
-      document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          const label = this.parentElement;
-          if (this.checked) {
-            label.classList.add('active');
-          } else {
-            label.classList.remove('active');
-          }
-          
-          // For settings panels
-          if (this.id === 'roundedCorners') {
-            const panel = document.getElementById('roundedCornersSettings');
-            if (panel) panel.style.display = this.checked ? 'block' : 'none';
-          } else if (this.id === 'multiColor') {
-            const panel = document.getElementById('multiColorSettings');
-            if (panel) panel.style.display = this.checked ? 'block' : 'none';
-          } else if (this.id === 'gradientFill') {
-            const panel = document.getElementById('gradientSettings');
-            if (panel) panel.style.display = this.checked ? 'block' : 'none';
-          }
-        });
-      });
-      
-      // Set up color palette interactions
-      document.querySelectorAll('.color').forEach(color => {
-        color.addEventListener('click', function() {
-          document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
-          this.classList.add('active');
-          const fillColorInput = document.getElementById('fillColor');
-          if (fillColorInput) {
-            fillColorInput.value = this.getAttribute('data-color');
-          }
-        });
-      });
-      
-      // Generate initial grid
-      generateGrid();
-      
-      // Log that initialization is complete
-      console.log('PixFlow initialized successfully');
-    };
-  </script>
-</body>
-</html>
+      // إضافة المستطيل إلى SVG
+      svg.appendChild(rect);
