@@ -1,4 +1,112 @@
-<!DOCTYPE html>
+function exportSVG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pixflow-pattern.svg';
+  link.click();
+  
+  // تنظيف
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+function exportPNG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  
+  const svgWidth = parseInt(svg.getAttribute('width'));
+  const svgHeight = parseInt(svg.getAttribute('height'));
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = svgWidth;
+    canvas.height = svgHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    // تنظيف عنوان URL
+    URL.revokeObjectURL(url);
+
+    // تنزيل ملف PNG
+    const pngUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = pngUrl;
+    link.download = 'pixflow-pattern.png';
+    link.click();
+  };
+  
+  // التعامل مع أي أخطاء قد تحدث عند تحميل الصورة
+  img.onerror = function() {
+    console.error('خطأ في تحميل SVG لتصدير PNG');
+    URL.revokeObjectURL(url);
+    alert('فشل تصدير PNG. الرجاء المحاولة مرة أخرى.');
+  };
+  
+  img.src = url;
+}
+
+// تهيئة واجهة المستخدم
+window.onload = function() {
+  // تهيئة التسميات
+  updatePercentLabel(document.getElementById('fillPercent').value);
+  updateCornerLabel(document.getElementById('cornerRadius').value);
+  
+  // إعداد مستمعي أحداث مربع الاختيار
+  document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const label = this.parentElement;
+      if (this.checked) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
+      }
+      
+      // للوحات الإعدادات
+      if (this.id === 'roundedCorners') {
+        document.getElementById('roundedCornersSettings').style.display = this.checked ? 'block' : 'none';
+      } else if (this.id === 'multiColor') {
+        document.getElementById('multiColorSettings').style.display = this.checked ? 'block' : 'none';
+      } else if (this.id === 'gradientFill') {
+        document.getElementById('gradientSettings').style.display = this.checked ? 'block' : 'none';
+      }
+    });
+  });
+  
+  // إعداد تفاعلات لوحة الألوان
+  document.querySelectorAll('.color').forEach(color => {
+    color.addEventListener('click', function() {
+      document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
+    });
+  });
+  
+  // توليد الشبكة الأولية
+  generateGrid();
+  
+  // تسجيل اكتمال التهيئة
+  console.log('تم تهيئة PixFlow بنجاح');
+}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -741,3 +849,29 @@ function generateGrid() {
       } else {
         rect.setAttribute('fill', color);
       }
+      
+      // تطبيق الزوايا المستديرة إذا تم تمكينها
+      if (roundedCorners) {
+        const rx = (cornerRadius/100) * (width/2);
+        const ry = (cornerRadius/100) * (height/2);
+        rect.setAttribute('rx', rx);
+        rect.setAttribute('ry', ry);
+      }
+      
+      // تطبيق الانحراف إذا تم تمكينه
+      if (applyShear) {
+        const skewX = Math.random() * 20 - 10;
+        const skewY = Math.random() * 20 - 10;
+        rect.setAttribute('transform', `skewX(${skewX}) skewY(${skewY})`);
+      }
+      
+      // إضافة المستطيل إلى SVG
+      svg.appendChild(rect);
+    }
+  }
+  
+  // معلومات تصحيح الأخطاء
+  console.log(`تم إنشاء شبكة: ${columns}×${rows} خلايا بأبعاد ${cellWidth}×${cellHeight}px`);
+  console.log(`الحجم الكلي: ${totalWidth}×${totalHeight}px`);
+  console.log(`نسبة الملء: ${fillPercent}%`);
+}
