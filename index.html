@@ -1,13 +1,400 @@
-<!DOCTYPE html>
+function exportSVG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pixflow-pattern.svg';
+  link.click();
+  
+  // تنظيف
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+function exportPNG() {
+  const svg = document.getElementById('grid');
+  
+  // تأكد من أن SVG له مساحة الاسم الصحيحة
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  
+  const svgWidth = parseInt(svg.getAttribute('width'));
+  const svgHeight = parseInt(svg.getAttribute('height'));
+  
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    canvas.width = svgWidth;
+    canvas.height = svgHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = document.getElementById('bgColor').value;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    // تنظيف عنوان URL
+    URL.revokeObjectURL(url);
+
+    // تنزيل ملف PNG
+    const pngUrl = canvas.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.href = pngUrl;
+    link.download = 'pixflow-pattern.png';
+    link.click();
+  };
+  
+  // التعامل مع أي أخطاء قد تحدث عند تحميل الصورة
+  img.onerror = function() {
+    console.error('خطأ في تحميل SVG لتصدير PNG');
+    URL.revokeObjectURL(url);
+    alert('فشل تصدير PNG. الرجاء المحاولة مرة أخرى.');
+  };
+  
+  img.src = url;
+}
+
+// تهيئة واجهة المستخدم
+window.onload = function() {
+  // تهيئة التسميات
+  updatePercentLabel(document.getElementById('fillPercent').value);
+  updateCornerLabel(document.getElementById('cornerRadius').value);
+  
+  // إعداد مستمعي أحداث مربع الاختيار
+  document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+      const label = this.parentElement;
+      if (this.checked) {
+        label.classList.add('active');
+      } else {
+        label.classList.remove('active');
+      }
+      
+      // للوحات الإعدادات
+      if (this.id === 'roundedCorners') {
+        document.getElementById('roundedCornersSettings').style.display = this.checked ? 'block' : 'none';
+      } else if (this.id === 'multiColor') {
+        document.getElementById('multiColorSettings').style.display = this.checked ? 'block' : 'none';
+      } else if (this.id === 'gradientFill') {
+        document.getElementById('gradientSettings').style.display = this.checked ? 'block' : 'none';
+      }
+    });
+  });
+  
+  // إعداد تفاعلات لوحة الألوان
+  document.querySelectorAll('.color').forEach(color => {
+    color.addEventListener('click', function() {
+      document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
+    });
+  });
+  
+  // توليد الشبكة الأولية
+  generateGrid();
+  
+  // تسجيل اكتمال التهيئة
+  console.log('تم تهيئة PixFlow بنجاح');
+}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>PixFlow - Enhanced</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
-    /* كل تنسيقاتك الأصلية هنا كما كتبتها */
-    /* (تم اختصارها هنا بالرد لتوفير المساحة) */
+    :root {
+      --primary: #18A0FB;
+      --primary-hover: #0d8ae2;
+      --background: #121212;
+      --card-bg: #1e1e1e;
+      --text: #f5f5f5;
+      --text-secondary: #bbb;
+      --input-bg: #2b2b2b;
+      --border: #333;
+    }
+    body {
+      margin: 0;
+      padding: 30px;
+      background: var(--background);
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+    }
+    h1 {
+      font-size: 48px;
+      margin-bottom: 5px;
+      text-align: center;
+      background: linear-gradient(90deg, #18A0FB, #8A2BE2);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 3px 10px rgba(24, 160, 251, 0.3);
+    }
+    .tagline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+      transform: translateY(-2px);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .card-header i {
+      font-size: 20px;
+      margin-right: 10px;
+      color: var(--primary);
+    }
+    .card-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .controls-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .control-group {
+      flex: 1;
+      min-width: 280px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+    }
+    .control-group h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 16px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+    .control-group h3 i {
+      margin-right: 8px;
+    }
+    .controls, .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: flex-start;
+    }
+    .controls label, .checkboxes label {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      width: 120px;
+    }
+    input[type="number"], input[type="range"] {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: #fff;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    input[type="number"]:focus, input[type="range"]:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 160, 251, 0.2);
+    }
+    input[type="color"] {
+      width: 100%;
+      height: 40px;
+      padding: 5px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--input-bg);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      background: var(--input-bg);
+      border-radius: 4px;
+      outline: none;
+      padding: 0;
+      margin: 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 5px rgba(24, 160, 251, 0.5);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(24, 160, 251, 0.5);
+    }
+    .checkboxes label {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      width: auto;
+      cursor: pointer;
+      padding: 8px 15px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .checkboxes label:hover {
+      background: rgba(24, 160, 251, 0.1);
+    }
+    .checkboxes label.active {
+      background: rgba(24, 160, 251, 0.15);
+    }
+    .checkboxes i {
+      color: var(--text-secondary);
+      font-size: 18px;
+    }
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+    button {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(24, 160, 251, 0.3);
+    }
+    button i {
+      font-size: 18px;
+    }
+    #grid-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    #grid {
+      margin: 20px auto;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: block;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    .settings-panel {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 12px;
+      display: none;
+    }
+    footer {
+      margin-top: 40px;
+      color: #888;
+      font-size: 14px;
+      text-align: center;
+      padding: 20px 0;
+    }
+    footer a {
+      color: #888;
+      margin: 0 10px;
+      font-size: 24px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    footer a:hover {
+      color: var(--primary);
+    }
+    .color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .color {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .color:hover {
+      transform: scale(1.1);
+    }
+    .color.active {
+      border-color: white;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+    }
+    .hidden {
+      display: none;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .preset-select {
+      padding: 10px;
+      background: var(--input-bg);
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .preset-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
   </style>
 </head>
 
@@ -17,7 +404,160 @@
 <p class="tagline">Advanced Pixel Pattern Generator</p>
 
 <div class="container">
-  <!-- كل العناصر والبطاقات التي كتبتها موجودة بدون أي حذف -->
+  <!-- Main Controls Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-sliders"></i>
+      <h2>Pattern Settings</h2>
+    </div>
+    
+    <div class="controls-container">
+      <!-- Grid Controls -->
+      <div class="control-group">
+        <h3><i class="fas fa-th"></i> Grid Dimensions</h3>
+        <div class="controls">
+          <label title="Cell Width in pixels">
+            Cell Width
+            <input type="number" id="cellWidth" value="40" min="5" max="200">
+          </label>
+          <label title="Cell Height in pixels">
+            Cell Height
+            <input type="number" id="cellHeight" value="40" min="5" max="200">
+          </label>
+          <label title="Number of Columns">
+            Columns
+            <input type="number" id="columns" value="10" min="1" max="50">
+          </label>
+          <label title="Number of Rows">
+            Rows
+            <input type="number" id="rows" value="10" min="1" max="50">
+          </label>
+        </div>
+      </div>
+      
+      <!-- Color Controls -->
+      <div class="control-group">
+        <h3><i class="fas fa-palette"></i> Color Settings</h3>
+        <div class="controls">
+          <label title="Fill Color for cells">
+            Fill Color
+            <input type="color" id="fillColor" value="#ff6666">
+          </label>
+          <label title="Background Color">
+            Background
+            <input type="color" id="bgColor" value="#121212">
+          </label>
+          <label title="Secondary Color for patterns">
+            Secondary
+            <input type="color" id="secondaryColor" value="#66aaff">
+          </label>
+          <label title="Fill Percentage">
+            Fill %
+            <input type="range" id="fillPercent" min="0" max="100" value="50" oninput="updatePercentLabel(this.value)">
+            <span id="percentLabel">50%</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Style Controls Card -->
+  <div class="card">
+    <div class="card-header">
+      <i class="fas fa-brush"></i>
+      <h2>Pattern Style</h2>
+    </div>
+    
+    <div class="checkboxes">
+      <label title="Generate cells with random sizes" id="randomSizeLabel">
+        <input type="checkbox" id="randomSize"> <i class="fas fa-dice"></i> Random Size
+      </label>
+      <label title="Apply rounded corners to cells" id="roundedCornersLabel">
+        <input type="checkbox" id="roundedCorners"> 
+        <i class="fas fa-circle"></i> Rounded Corners
+      </label>
+      <label title="Use multiple colors" id="multiColorLabel">
+        <input type="checkbox" id="multiColor"> 
+        <i class="fas fa-palette"></i> Multi-Color
+      </label>
+      <label title="Apply shearing effect" id="applyShearLabel">
+        <input type="checkbox" id="applyShear"> 
+        <i class="fas fa-wave-square"></i> Shear
+      </label>
+      <label title="Create patterns with gradients" id="gradientFillLabel">
+        <input type="checkbox" id="gradientFill"> 
+        <i class="fas fa-paint-roller"></i> Gradient
+      </label>
+    </div>
+    
+    <!-- Rounded Corners Settings -->
+    <div id="roundedCornersSettings" class="settings-panel">
+      <label title="Corner Radius Percentage">
+        Corner Radius %
+        <input type="range" id="cornerRadius" min="0" max="50" value="10" oninput="updateCornerLabel(this.value)">
+        <span id="cornerLabel">10%</span>
+      </label>
+    </div>
+    
+    <!-- Multi-Color Settings -->
+    <div id="multiColorSettings" class="settings-panel">
+      <div class="flex-between">
+        <h3>Color Palette</h3>
+        <select id="colorPreset" class="preset-select" onchange="applyColorPreset()">
+          <option value="custom">Custom</option>
+          <option value="retro">Retro Vibes</option>
+          <option value="ocean">Ocean Depths</option>
+          <option value="sunset">Sunset Glow</option>
+          <option value="forest">Forest Tones</option>
+        </select>
+      </div>
+      <div class="color-palette" id="colorPalette">
+        <div class="color active" style="background-color: #ff6666;" data-color="#ff6666"></div>
+        <div class="color" style="background-color: #66aaff;" data-color="#66aaff"></div>
+        <div class="color" style="background-color: #66ff66;" data-color="#66ff66"></div>
+        <div class="color" style="background-color: #ffff66;" data-color="#ffff66"></div>
+        <div class="color" style="background-color: #ff66ff;" data-color="#ff66ff"></div>
+      </div>
+    </div>
+    
+    <!-- Gradient Settings -->
+    <div id="gradientSettings" class="settings-panel">
+      <div class="controls">
+        <label title="Start Color">
+          Start Color
+          <input type="color" id="gradientStart" value="#ff6666">
+        </label>
+        <label title="End Color">
+          End Color
+          <input type="color" id="gradientEnd" value="#66aaff">
+        </label>
+        <label title="Gradient Type">
+          Direction
+          <select id="gradientDirection" class="preset-select">
+            <option value="horizontal">Horizontal</option>
+            <option value="vertical">Vertical</option>
+            <option value="diagonal">Diagonal</option>
+            <option value="radial">Radial</option>
+          </select>
+        </label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Actions Card -->
+  <div class="card">
+    <div class="btn-container">
+      <button onclick="generateGrid()"><i class="fas fa-magic"></i> Generate Pattern</button>
+      <button onclick="exportSVG()"><i class="fas fa-file-code"></i> Export SVG</button>
+      <button onclick="exportPNG()"><i class="fas fa-file-image"></i> Export PNG</button>
+      <button onclick="randomizeAll()"><i class="fas fa-random"></i> Randomize All</button>
+    </div>
+  </div>
+
+  <!-- Grid Display -->
+  <div id="grid-container">
+    <svg id="grid" width="400" height="400" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
 </div>
 
 <footer>
@@ -29,15 +569,146 @@
 </footer>
 
 <script>
-// كل السكربتات التي كتبتها الأصلية هنا بنفس ترتيبك
-// فقط أضفت في النهاية إغلاق سليم للدالة
-// وأضفت تعديل صغير لتوسيط الكانفس بعد التوليد
+// تحديث التسميات
+function updatePercentLabel(value) {
+  document.getElementById('percentLabel').innerText = value + '%';
+}
 
-// --- نهاية الدالة generateGrid() ---
+function updateCornerLabel(value) {
+  document.getElementById('cornerLabel').innerText = value + '%';
+}
+
+// تبديل لوحات الإعدادات
+function toggleSettings(panelId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  
+  const isVisible = panel.style.display === 'block';
+  panel.style.display = isVisible ? 'none' : 'block';
+  
+  // إذا كان هذا هو مربع الاختيار الذي تم تبديله، فقم بتحديث فئة التسمية الخاصة به
+  const checkboxId = panelId.replace('Settings', '');
+  const label = document.getElementById(checkboxId + 'Label');
+  if (label) {
+    if (isVisible) {
+      label.classList.remove('active');
+    } else {
+      label.classList.add('active');
+    }
+  }
+}
+
+// مجموعات الألوان
+function applyColorPreset() {
+  const preset = document.getElementById('colorPreset').value;
+  const palette = document.getElementById('colorPalette');
+  palette.innerHTML = '';
+  
+  let colors = [];
+  
+  switch(preset) {
+    case 'retro':
+      colors = ['#FF6B6B', '#4ECDC4', '#F9D423', '#FF4E50', '#556270'];
+      break;
+    case 'ocean':
+      colors = ['#1A535C', '#4ECDC4', '#F7FFF7', '#2B7A78', '#DEF2F1'];
+      break;
+    case 'sunset':
+      colors = ['#F9C80E', '#FF4365', '#5B2E5F', '#F15946', '#2C0835'];
+      break;
+    case 'forest':
+      colors = ['#2D3047', '#93B7BE', '#E0CA3C', '#A37B45', '#3A5311'];
+      break;
+    default:
+      colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
+  }
+  
+  colors.forEach(color => {
+    const div = document.createElement('div');
+    div.className = 'color';
+    div.style.backgroundColor = color;
+    div.setAttribute('data-color', color);
+    div.addEventListener('click', function() {
+      document.querySelectorAll('.color').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      document.getElementById('fillColor').value = this.getAttribute('data-color');
+    });
+    palette.appendChild(div);
+  });
+  
+  // تعيين اللون الأول كنشط
+  if (palette.firstChild) {
+    palette.firstChild.classList.add('active');
+    document.getElementById('fillColor').value = colors[0];
+  }
+}
+
+// عشوائية جميع الإعدادات
+function randomizeAll() {
+  // عشوائية الأبعاد
+  document.getElementById('cellWidth').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('cellHeight').value = Math.floor(Math.random() * 45) + 15;
+  document.getElementById('columns').value = Math.floor(Math.random() * 15) + 5;
+  document.getElementById('rows').value = Math.floor(Math.random() * 15) + 5;
+  
+  // عشوائية نسبة الملء
+  const fillPercent = Math.floor(Math.random() * 80) + 20;
+  document.getElementById('fillPercent').value = fillPercent;
+  updatePercentLabel(fillPercent);
+  
+  // عشوائية الألوان
+  document.getElementById('fillColor').value = getRandomColor();
+  document.getElementById('secondaryColor').value = getRandomColor();
+  document.getElementById('bgColor').value = getRandomColor(true);
+  
+  // عشوائية الميزات
+  document.getElementById('randomSize').checked = Math.random() > 0.5;
+  document.getElementById('roundedCorners').checked = Math.random() > 0.5;
+  document.getElementById('multiColor').checked = Math.random() > 0.5;
+  document.getElementById('applyShear').checked = Math.random() > 0.5;
+  document.getElementById('gradientFill').checked = Math.random() > 0.5;
+  
+  // تحديث لوحات الإعدادات
+  document.getElementById('roundedCornersSettings').style.display = 
+    document.getElementById('roundedCorners').checked ? 'block' : 'none';
+  document.getElementById('multiColorSettings').style.display = 
+    document.getElementById('multiColor').checked ? 'block' : 'none';
+  document.getElementById('gradientSettings').style.display = 
+    document.getElementById('gradientFill').checked ? 'block' : 'none';
+  
+  // تحديث حالة واجهة المستخدم
+  document.querySelectorAll('.checkboxes input[type="checkbox"]').forEach(checkbox => {
+    const label = checkbox.parentElement;
+    if (checkbox.checked) {
+      label.classList.add('active');
+    } else {
+      label.classList.remove('active');
+    }
+  });
+  
+  // توليد الشبكة
+  generateGrid();
+}
+
+function getRandomColor(dark = false) {
+  if (dark) {
+    // توليد ألوان أغمق للخلفية
+    return '#' + Math.floor(Math.random() * 0x444444).toString(16).padStart(6, '0');
+  }
+  return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+}
+
+// وظيفة توليد الشبكة الرئيسية
 function generateGrid() {
+  // الحصول على إشارة إلى عنصر SVG
   const svg = document.getElementById('grid');
-  svg.innerHTML = '';
-
+  
+  // مسح المحتوى الحالي
+  while (svg.firstChild) {
+    svg.removeChild(svg.firstChild);
+  }
+  
+  // الحصول على جميع الإعدادات
   const cellWidth = parseInt(document.getElementById('cellWidth').value) || 40;
   const cellHeight = parseInt(document.getElementById('cellHeight').value) || 40;
   const columns = parseInt(document.getElementById('columns').value) || 10;
@@ -46,41 +717,52 @@ function generateGrid() {
   const secondaryColor = document.getElementById('secondaryColor').value;
   const bgColor = document.getElementById('bgColor').value;
   const fillPercent = parseInt(document.getElementById('fillPercent').value) || 50;
-
+  
+  // تبديل الميزات
   const randomSize = document.getElementById('randomSize').checked;
   const roundedCorners = document.getElementById('roundedCorners').checked;
   const multiColor = document.getElementById('multiColor').checked;
   const applyShear = document.getElementById('applyShear').checked;
   const gradientFill = document.getElementById('gradientFill').checked;
-
+  
+  // إعدادات إضافية
   const cornerRadius = parseInt(document.getElementById('cornerRadius')?.value) || 10;
   const gradientStart = document.getElementById('gradientStart')?.value || '#ff6666';
   const gradientEnd = document.getElementById('gradientEnd')?.value || '#66aaff';
   const gradientDirection = document.getElementById('gradientDirection')?.value || 'horizontal';
-
+  
+  // تعيين أبعاد SVG
   const totalWidth = columns * cellWidth;
   const totalHeight = rows * cellHeight;
-
   svg.setAttribute('width', totalWidth);
   svg.setAttribute('height', totalHeight);
   svg.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
-  svg.style.background = bgColor;
-
-  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  bgRect.setAttribute('width', totalWidth);
-  bgRect.setAttribute('height', totalHeight);
-  bgRect.setAttribute('fill', bgColor);
-  svg.appendChild(bgRect);
-
+  
+  // إضافة مستطيل الخلفية
+  const background = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  background.setAttribute('width', totalWidth);
+  background.setAttribute('height', totalHeight);
+  background.setAttribute('fill', bgColor);
+  svg.appendChild(background);
+  
+  // إذا كان التدرج مفعلاً، قم بإنشاء التعريفات
   if (gradientFill) {
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-    svg.appendChild(defs);
-
-    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 
-                    gradientDirection === 'radial' ? 'radialGradient' : 'linearGradient');
-    gradient.setAttribute('id', 'cellGradient');
-
-    if (gradientDirection !== 'radial') {
+    
+    let gradient;
+    if (gradientDirection === 'radial') {
+      gradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+      gradient.setAttribute('id', 'cellGradient');
+      gradient.setAttribute('cx', '50%');
+      gradient.setAttribute('cy', '50%');
+      gradient.setAttribute('r', '50%');
+      gradient.setAttribute('fx', '50%');
+      gradient.setAttribute('fy', '50%');
+    } else {
+      gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+      gradient.setAttribute('id', 'cellGradient');
+      
+      // تعيين اتجاه التدرج
       switch(gradientDirection) {
         case 'horizontal':
           gradient.setAttribute('x1', '0%');
@@ -102,20 +784,23 @@ function generateGrid() {
           break;
       }
     }
-
+    
+    // إضافة نقاط التوقف
     const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
     stop1.setAttribute('offset', '0%');
     stop1.setAttribute('stop-color', gradientStart);
-
+    
     const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
     stop2.setAttribute('offset', '100%');
     stop2.setAttribute('stop-color', gradientEnd);
-
+    
     gradient.appendChild(stop1);
     gradient.appendChild(stop2);
     defs.appendChild(gradient);
+    svg.appendChild(defs);
   }
-
+  
+  // احصل على الألوان المتاحة إذا كان متعدد الألوان مفعلاً
   let colors = [];
   if (multiColor) {
     document.querySelectorAll('.color').forEach(color => {
@@ -124,64 +809,69 @@ function generateGrid() {
         colors.push(dataColor);
       }
     });
+    
+    // إذا لم يتم العثور على ألوان، استخدم الافتراضية
     if (colors.length === 0) {
       colors = ['#ff6666', '#66aaff', '#66ff66', '#ffff66', '#ff66ff'];
     }
   }
-
+  
+  // إنشاء خلايا الشبكة
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
+      // تطبيق نسبة الملء
       if (Math.random() * 100 > fillPercent) continue;
-
+      
       let width = cellWidth;
       let height = cellHeight;
-
+      
       if (randomSize) {
         width = cellWidth * (0.5 + Math.random());
         height = cellHeight * (0.5 + Math.random());
       }
-
+      
+      // تحديد لون الخلية
       let color = fillColor;
       if (multiColor && colors.length > 0) {
         color = colors[Math.floor(Math.random() * colors.length)];
       }
-
+      
+      // إنشاء المستطيل
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       rect.setAttribute('x', x * cellWidth);
       rect.setAttribute('y', y * cellHeight);
       rect.setAttribute('width', width);
       rect.setAttribute('height', height);
-
+      
+      // تطبيق اللون أو التدرج
       if (gradientFill) {
         rect.setAttribute('fill', 'url(#cellGradient)');
       } else {
         rect.setAttribute('fill', color);
       }
-
+      
+      // تطبيق الزوايا المستديرة إذا تم تمكينها
       if (roundedCorners) {
         const rx = (cornerRadius/100) * (width/2);
         const ry = (cornerRadius/100) * (height/2);
         rect.setAttribute('rx', rx);
         rect.setAttribute('ry', ry);
       }
-
+      
+      // تطبيق الانحراف إذا تم تمكينه
       if (applyShear) {
         const skewX = Math.random() * 20 - 10;
         const skewY = Math.random() * 20 - 10;
         rect.setAttribute('transform', `skewX(${skewX}) skewY(${skewY})`);
       }
-
+      
+      // إضافة المستطيل إلى SVG
       svg.appendChild(rect);
     }
   }
-
-  // تحسين: توسيط الشبكة تلقائيًا داخل الكانفس
-  const container = document.getElementById('grid-container');
-  container.style.display = 'flex';
-  container.style.justifyContent = 'center';
-  container.style.alignItems = 'center';
+  
+  // معلومات تصحيح الأخطاء
+  console.log(`تم إنشاء شبكة: ${columns}×${rows} خلايا بأبعاد ${cellWidth}×${cellHeight}px`);
+  console.log(`الحجم الكلي: ${totalWidth}×${totalHeight}px`);
+  console.log(`نسبة الملء: ${fillPercent}%`);
 }
-</script>
-
-</body>
-</html>
